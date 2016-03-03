@@ -1,0 +1,17 @@
+<template name="games">
+    <h3>Games</h3>
+    {{#if isCreatingGame }}
+        <form class="create-game">
+            <input name="name" type="text">
+            <button type="submit">Create Game</button>
+            <a class="cancel" href="#">Cancel</a>
+        </form>
+    {{else}}
+        <a class="create" href="#">Create</a>
+    {{/if}}
+    <ul>
+        {{#each games}}
+        <li><a href="./games/{{_id}}">{{name}} || {{players.length}}</a></li>
+        {{/each}}
+    </ul>
+</template>

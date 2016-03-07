@@ -68,7 +68,5 @@ Template.game.events({
 				board: createBoard(7)
 			}
 		});
-		
-		Session.set('gameId', this.gameId);
 	}
 })

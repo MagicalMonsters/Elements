@@ -21,7 +21,7 @@ Template.board.helpers({
 						playerID = k;
 						warriorLabel = data.players[k].warriors[index].label;
 						var composition = data.players[k].warriors[index].composition;
-						Warrior.type(composition);
+						warriorType = Warrior.type(composition);
 						break;
 					}
 				}

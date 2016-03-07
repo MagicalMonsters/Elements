@@ -11,10 +11,17 @@ Template.game.helpers({
 function createBoard(bs){
 
 	var board = [];
+	var active = Math.floor(bs/2);
 	for(var i = 0;i<bs ;i++){
 		for(var j = 0;j<bs ; j++){
-			board.push(Math.floor(Math.random()*4.0));
+			if(j < Math.abs(active) || j >= bs-Math.abs(active)){
+				board.push(0);
+			}
+			else{
+				board.push(Math.floor(Math.random()*4.0)+1);
+			}
 		}
+		active--;
 	}
 	
 	return board;

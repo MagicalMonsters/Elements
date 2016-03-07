@@ -12,9 +12,9 @@ Template.board.helpers({
 		
 		for(var i = 0; i < bs; i++) {
 			for(var j = 0; j < bs; j++ ){
-				var playerId = 1;
-				var warriorType = 1;
-				var warriorLabel = "A";
+				var playerId = -1;
+				var warriorType = -1;
+				var warriorLabel = "";
 				/*
 				for(var k = 0; k < data.players.size() ; k++){
 					var index = _.find(data.players[k].warriors, function(warrior){ return warrior.position == i*bs + j } );

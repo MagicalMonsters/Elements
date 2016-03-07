@@ -2,10 +2,14 @@
     <a href="/">back</a>
     <h3>hello</h3>
     <h3>{{name}}</h3>
-    <a id="join-btn" href="#">join</a>
+	{{#if canJoin}}
+		<a id="join-btn" href="#">join</a>
+	{{/if}}
 	<a id="leave-btn" href="#">leave</a>
-    {{#if isOwner}}
+    {{#if canStart}}
         <a id="start-btn" href="#">start</a>
     {{/if}}
-	{{>board}}
+	{{#if isStarted}}
+		{{>board}}
+	{{/if}}
 </template>

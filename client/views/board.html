@@ -1,10 +1,10 @@
 <template name="board">
-	<table>
+	<table class="board">
 		{{#each board}}
 			<tr>
 			{{#each row}}
-				<td style="text-align:center; vertical-align: middle; width:40px; height:40px; background-color: {{color}}">
-					A
+				<td  class ="cell" style="background-color: {{color}}">
+				
 				</td>
 			{{/each}}
 			</tr>

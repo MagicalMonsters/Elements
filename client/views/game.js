@@ -2,10 +2,17 @@ Template.game.helpers({
     name: function () {
         return Games.findOne({_id : this.gameId}).name;
     },
-    isOwner: function () {
-        var owner = Games.findOne({_id: this.gameId}).owner;
-        return Meteor.userId() == owner.userId;
+	canJoin: function (){
+		var game = Games.findOne({_id: this.gameId});
+        return (Meteor.userId() != game.owner.userId) && (game.turn == -1) && _.find(game.players, function (player){ return player.userId == Meteor.userId(); }) == undefined;
+	},
+    canStart: function () {
+		var game = Games.findOne({_id: this.gameId});
+        return (Meteor.userId() == game.owner.userId) && (game.turn == -1);
     },
+	isStarted: function () {
+        return Games.findOne({_id: this.gameId}).turn >= 0;
+	},
 });
 
 function createBoard(bs){

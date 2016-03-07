@@ -4,4 +4,7 @@
     <h3>{{name}}</h3>
     <a id="join-btn" href="#">join</a>
 	<a id="leave-btn" href="#">leave</a>
+    {{#if isOwner}}
+        <a id="start-btn" href="#">start</a>
+    {{/if}}
 </template>

@@ -1,7 +1,11 @@
 Template.game.helpers({
     name: function () {
         return Games.findOne({_id : this.gameId}).name;
-    }
+    },
+    isOwner: function () {
+        var owner = Games.findOne({_id: this.gameId}).owner;
+        return Meteor.userId() == owner.userId;
+    },
 });
 
 Template.game.events({

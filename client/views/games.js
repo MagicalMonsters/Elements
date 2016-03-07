@@ -34,6 +34,10 @@ Template.games.events({
             createdAt: new Date(),
             name: gameName, 
             turn: -1, 
+            owner: {
+                userName: Meteor.user().username,
+                userId: Meteor.userId()
+            },
             players:[{
                 userName: Meteor.user().username,
                 userId: Meteor.userId(),

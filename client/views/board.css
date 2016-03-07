@@ -6,6 +6,87 @@ table.board {
 td.cell {
 	text-align: center; 
 	vertical-align: middle; 
-	width: 40px; 
-	height: 40px;
+	width: 60px; 
+	height: 60px;
+}
+
+svg.warrior {
+	width: 60px;
+	height: 60px;
+}
+
+circle.warrior-1 {
+	r: 0;
+	cx: 30;
+	cy: 30;
+}
+
+circle.warrior0 {
+	r : 20;
+	fill: red;
+	cx : 30;
+	cy: 30;
+}
+
+circle.warrior1 {
+	r : 20;
+	fill: blue;
+	cx : 30;
+	cy: 30;
+}
+
+circle.warrior2 {
+	r : 20;
+	fill: white;
+	cx : 30;
+	cy: 30;
+}
+
+circle.warrior3 {
+	r : 20;
+	fill: yellow;
+	cx : 30;
+	cy: 30;
+}
+
+circle.player-1 {
+	r : 0;
+	cx: 30;
+	cy: 30;
+}
+
+circle.player0 {
+	r : 26;
+	fill: purple;
+	cx : 30;
+	cy: 30;
+	stroke: black;
+	stroke-width: 2;
+}
+
+circle.player1 {
+	r : 26;
+	fill: green;
+	cx : 30;
+	cy: 30;
+	stroke: black;
+	stroke-width: 2;
+}
+
+circle.player2 {
+	r : 26;
+	fill: orange;
+	cx : 30;
+	cy: 30;
+	stroke: black;
+	stroke-width: 2;
+}
+
+circle.player3 {
+	r : 26;
+	fill: yellow;
+	cx : 30;
+	cy: 30;
+	stroke: black;
+	stroke-width: 2;
 }

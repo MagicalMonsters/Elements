@@ -8,6 +8,18 @@ Template.game.helpers({
     },
 });
 
+function createBoard(bs){
+
+	var board = [];
+	for(var i = 0;i<bs ;i++){
+		for(var j = 0;j<bs ; j++){
+			board.push(Math.floor(Math.random()*4.0));
+		}
+	}
+	
+	return board;
+}
+
 Template.game.events({
     'click a#join-btn': function (e, tpl) {
         e.preventDefault();
@@ -31,5 +43,18 @@ Template.game.events({
                 }
             }
         });
-    }
+    },
+	
+	'click a#start-btn': function (e, tpl) {
+		e.preventDefault();
+		Games.update({_id : this.gameId}, {
+			$set: {
+				turn: 0,
+				boardSize: 7, 
+				board: createBoard(7)
+			}
+		});
+		
+		Session.set('gameId', this.gameId);
+	}
 })

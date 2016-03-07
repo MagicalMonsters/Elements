@@ -41,7 +41,7 @@ Template.games.events({
             players:[{
                 userName: Meteor.user().username,
                 userId: Meteor.userId(),
-            }]
+            }],
         });
         Session.set('isCreatingGame', false);
     }

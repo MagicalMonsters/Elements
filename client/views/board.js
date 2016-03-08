@@ -7,7 +7,7 @@ Template.board.helpers({
 		var bs = data.boardSize;
 		var board  = [];
 		var row = [];
-		var colors = ["black","red","green","blue","white"];
+		var colors = ["black","brown","blue","red","green"];
 		
 		
 		for(var i = 0; i < bs; i++) {

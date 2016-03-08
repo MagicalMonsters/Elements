@@ -15,78 +15,63 @@ svg.warrior {
 	height: 60px;
 }
 
-circle.warrior-1 {
-	r: 0;
+circle.warrior {
 	cx: 30;
 	cy: 30;
 }
 
+circle.warrior-1 {
+	r: 0;
+}
+
 circle.warrior0 {
 	r : 20;
-	fill: red;
-	cx : 30;
-	cy: 30;
+	fill: brown;
 }
 
 circle.warrior1 {
 	r : 20;
 	fill: blue;
-	cx : 30;
-	cy: 30;
 }
 
 circle.warrior2 {
 	r : 20;
-	fill: white;
-	cx : 30;
-	cy: 30;
+	fill: red;
 }
 
 circle.warrior3 {
 	r : 20;
-	fill: yellow;
-	cx : 30;
+	fill: green;
+}
+
+circle.player {
+	cx: 30;
 	cy: 30;
+	stroke: black;
+	stroke-width: 2;
 }
 
 circle.player-1 {
 	r : 0;
-	cx: 30;
-	cy: 30;
+	stroke-width: 0;
 }
 
 circle.player0 {
 	r : 26;
 	fill: purple;
-	cx : 30;
-	cy: 30;
-	stroke: black;
-	stroke-width: 2;
 }
 
 circle.player1 {
 	r : 26;
-	fill: green;
-	cx : 30;
-	cy: 30;
-	stroke: black;
-	stroke-width: 2;
+	fill: white;
 }
 
 circle.player2 {
 	r : 26;
 	fill: orange;
-	cx : 30;
-	cy: 30;
-	stroke: black;
-	stroke-width: 2;
 }
 
 circle.player3 {
 	r : 26;
 	fill: yellow;
-	cx : 30;
-	cy: 30;
-	stroke: black;
-	stroke-width: 2;
 }

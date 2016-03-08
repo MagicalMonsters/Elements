@@ -54,11 +54,16 @@ function validate(game, index) {
         return false;
     } 
 
-    var warriors = _(_(game.players).map(function (player){
-            return player.warriors;
-    })).flatten();
-
-    return _(warriors).find(function (warrior){return warrior.position == index}) == undefined;
+    for (var player in game.players) {
+        if (player != undefined && player.warriors != undefined) {
+            for (var warrior in player.warriors) {
+                if (warrior.position == index) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
 }
 
 function create(gameId, elements, coordination) {
@@ -74,22 +79,11 @@ function create(gameId, elements, coordination) {
     }
     
     var game = Games.findOne({_id: gameId});
-    var boardCellIndex = coordination[0] + coordination[1]*game.boardSize;
+    coordination = coordination.split(",");
+    var boardCellIndex = parseInt(coordination[1]) + parseInt(coordination[0])*game.boardSize;
     if (!validate(game, boardCellIndex)) {
         return "Not a valid position";
     }
 
-    Game.update({_id: gameId, "players.userId": Meteor.userId()}, 
-                {
-                    $set: {"players.$.warriors": [{
-                        position: index,
-                        composition: elems,
-                        backpack: [0,0,0,0],
-                        turnsToReincarnation: 5,
-                        moves: 0,
-                        label: 'A',
-                    }]}
-                }
-               );
-               
+    Meteor.call("createWarrior", gameId, boardCellIndex, elems);
 }

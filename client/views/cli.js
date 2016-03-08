@@ -87,3 +87,60 @@ function create(gameId, elements, coordination) {
 
     Meteor.call("createWarrior", gameId, boardCellIndex, elems);
 }
+
+function move(gameId, label, direction) {
+    var game = Games.findOne({_id: gameId});
+    var playerWarriors = _.find(game.players, function (player) {
+        return player._id == Meteor.userId();
+    }).warriors;
+
+    // get the warrior with the specified label
+    var warrior = _.find(playerWarriors, function (warrior) {
+        return warrior.label == label;
+    });
+
+    if (warrior == undefined) {
+        return "No warrior with this label.";
+    }
+    var directions = [[0,-1], [0,1], [-1,0], [1,0]];
+    var directionLetters = ['l', 'r', 'u', 'd'];
+    var indexOf = _.indexOf(directionLetters, direction);
+    if (indexOf == -1) {
+        return "Invalid direction.";
+    }
+    var r = warrior.position / game.boardSize;
+    var c = warrior.position % game.boardSize;
+    
+    var newR = r + directions[indexOf][0];
+    var newC = c + directions[indexOf][1];
+
+    if (newR < 0 || newR >= game.boardSize || newC < 0 || newC >= game.boardSize) {
+        return "Cannot move to that direction. (out of bound)";
+    }
+
+    var newPosition = newR*game.boardSize + newC;
+    if (game.board[newPosition] == 0) {
+        return "Cannot move to that direction. (empty)";
+    }
+
+    // see if another warrior is in that position
+
+    var anotherWarrior = _.find(playerWarriors, function (warrior){
+        return warrior.position == newPosition;
+    });
+
+    if (anotherWarrior != undefined) {
+        return "You have a warrior in that position.";
+    }
+
+    for (player in game.players) {
+        for (warrior in player.warriors) {
+            if (warrior.position == newPosition) {
+                // TODO: should attack
+                // and should return
+            }
+        }
+    }
+
+    // move
+}

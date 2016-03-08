@@ -15,8 +15,8 @@ Template.board.helpers({
 				var playerId = -1;
 				var warriorType = -1;
 				var warriorLabel = "";
-				/*
-				for(var k = 0; k < data.players.size() ; k++){
+				
+				for(var k = 0; k < data.players.length ; k++){
 					var index = _.find(data.players[k].warriors, function(warrior){ return warrior.position == i*bs + j } );
 					if(index != undefined){
 						playerID = k;
@@ -24,7 +24,8 @@ Template.board.helpers({
 						var composition = data.players[k].warriors[index].composition;
 						break;
 					}
-				}*/
+				}
+				
 				row.push( { "color" : colors[data.board[i*bs + j]] , "playerClass" : "player"+playerId , "warriorClass" : "warrior"+warriorType , "label" : warriorLabel } );
 			}
 			board.push({ "row" : row });

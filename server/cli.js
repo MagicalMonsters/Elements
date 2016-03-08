@@ -11,5 +11,11 @@ Meteor.methods({
                                             }]
              }
         });
-    }
+    },
+	
+	'warriorSetPosition': function (gameId, warriorLabel, position ) {
+		Games.update({_id: gameId, "players.userId":  Meteor.userId(), "players.warriors.label": warriorLabel}, {
+             $push: {"players.warriors.$0.warriors.$1.position": position }
+        });
+	},
 });

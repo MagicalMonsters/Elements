@@ -17,11 +17,12 @@ Template.board.helpers({
 				var warriorLabel = "";
 				
 				for(var k = 0; k < data.players.length ; k++){
-					var index = _.find(data.players[k].warriors, function(warrior){ return warrior.position == i*bs + j } );
-					if(index != undefined){
-						playerID = k;
-						warriorLabel = data.players[k].warriors[index].label;
-						var composition = data.players[k].warriors[index].composition;
+					var warrior = _.find(data.players[k].warriors, function(warrior){ return warrior.position == i*bs + j } );
+					if( !(_.isUndefined(warrior))){
+						playerId = k;
+						warriorLabel = warrior.label;
+						var composition = warrior.composition;
+						warriorType = Warrior.type(composition);
 						break;
 					}
 				}

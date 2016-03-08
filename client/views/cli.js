@@ -1,6 +1,6 @@
 Template.cli.helpers({
     isMyTurn: function () {
-        var gameId = Session.get("gameId");
+        var gameId = this.gameId;
         var game = Games.findOne({_id: gameId});
         var myIndex = _.findIndex(game.players, function (player){
             return player.userId == Meteor.userId();
@@ -20,12 +20,12 @@ Template.cli.events({
         e.preventDefault();
         var command = tpl.$('input[name=command]').val();
         console.log(command);
-        var log = parse(command);
+        var log = parse(this.gameId, command);
         Session.set("log",log);
     }
 });
 
-function parse(command) {
+function parse(gameId, command) {
     if (_.isEmpty(command)) {
         return "";
     }
@@ -35,15 +35,15 @@ function parse(command) {
     }
     var action = tokens[0].toLowerCase();
     if (action == "create") {
-        return create(tokens[1], tokens[2]);
+        return create(gameId, tokens[1], tokens[2]);
     } else if (action == "move") {
-        return move(tokens[1], tokens[2]);
+        return move(gameId, tokens[1], tokens[2]);
     } else if (action == "add") {
-        return add(tokens[1]);    
+        return add(gameId, tokens[1]);    
     } else if (action == "split") {
-        return split(tokens[1], tokens[2]);
+        return split(gameId, tokens[1], tokens[2]);
     } else if (action == "end") {
-        return end();
+        return end(gameId);
     } else {
         return "unknown command!";
     }
@@ -61,7 +61,7 @@ function validate(game, index) {
     return _(warriors).find(function (warrior){return warrior.position == index}) == undefined;
 }
 
-function create(elements, coordination) {
+function create(gameId, elements, coordination) {
     var elems = elements.split(",");
     elems = _(elems).map(function (elem) {
         return parseInt(elem);
@@ -73,14 +73,13 @@ function create(elements, coordination) {
         return "The sum should be 2000";
     }
     
-    console.log("Game id: " + this.gameId );
-    var game = Games.findOne({_id: Session.get("gameId")});
+    var game = Games.findOne({_id: gameId});
     var boardCellIndex = coordination[0] + coordination[1]*game.boardSize;
     if (!validate(game, boardCellIndex)) {
         return "Not a valid position";
     }
 
-    Game.update({_id: Session.get("gameId"), "players.userId": Meteor.userId()}, 
+    Game.update({_id: gameId, "players.userId": Meteor.userId()}, 
                 {
                     $set: {"players.$.warriors": [{
                         position: index,

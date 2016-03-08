@@ -1,7 +1,7 @@
 Template.board.helpers({
 
 	board : function () {
-		var gameID = Session.get("gameId");
+		var gameID = this.gameId;
 		var data = Games.findOne({_id: gameID});
 		
 		var bs = data.boardSize;

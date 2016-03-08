@@ -42,6 +42,7 @@ Template.game.events({
                     {
                     userName: Meteor.user().username,
                     userId: Meteor.userId(),
+                    warriors: [],
                 }
             }
         });
@@ -52,7 +53,6 @@ Template.game.events({
         Games.update({_id : this.gameId}, {
             $pull: {players: 
                     {
-                    userName: Meteor.user().username,
                     userId: Meteor.userId(),
                 }
             }

@@ -41,6 +41,7 @@ Template.games.events({
             players:[{
                 userName: Meteor.user().username,
                 userId: Meteor.userId(),
+                warriors: []
             }],
         });
         Session.set('isCreatingGame', false);

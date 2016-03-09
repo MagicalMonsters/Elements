@@ -28,4 +28,8 @@ Meteor.methods({
              $set: {"players.$.warriors": warriors}
         });
 	},
+	
+	'warriorSetComposition': function(gameId , userId , warriorLabel, composition){
+		
+	}
 });

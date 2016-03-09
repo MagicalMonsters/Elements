@@ -76,15 +76,6 @@ function create(gameId, elements, coordination) {
 function move(gameId, label, direction) {
 
     var game = Games.findOne({_id: gameId});
-    
-	/*var playerWarriors = _.find(game.players, function (player) {
-        return player.userId == Meteor.userId();
-    }).warriors;
-
-    // get the warrior with the specified label
-    var warrior = _.find(playerWarriors, function (warrior) {
-        return warrior.label == label;
-    });*/
 	
 	var warrior = Warrior.getWarrior(gameId, Meteor.userId(), label);
 
@@ -114,7 +105,12 @@ function move(gameId, label, direction) {
 			return "Cannot move to that direction. (your warrior)";
 		}
 		else{
+			return attack(gameId, warrior, otherWarrior);
 			return "Should attack";
 		}
 	}
+}
+
+function attack(gameId, warrior1, warrior2){
+	
 }

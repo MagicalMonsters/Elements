@@ -24,11 +24,11 @@ Board.directionOfCell = function ( game , position , direction){
     var indexOf = _.indexOf(directionLetters, direction);
 	
 	if (indexOf == -1) {
-        return { "message": "Invalid direction" , "position": -1};
+		return  -100;
     }
 	
 	var newPosition = position + (directions[indexOf][0] * game.boardSize) + directions[indexOf][1];
 
-    return { "message": "success" , "position": newPosition };
+    return newPosition;
 	
 }

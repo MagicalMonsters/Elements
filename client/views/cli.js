@@ -90,56 +90,28 @@ function move(gameId, label, direction) {
     
 	var cellToMove = Board.directionOfCell(game, warrior.position, direction);
 	
-	if( cellToMove.message != "success" ){
-		return cellToMove.message;
+	if( cellToMove < -50 ) {
+		return "Invalid direction";
 	}
 	
-	var cellType = Board.cellType(game, cellToMove.position);
+	var cellType = Board.cellType(game, cellToMove);
 	
 	if(cellType.type == "wall"){
 		return "Cannot move to that direction. (wall)";
 	}
 	else if(cellType.type == "empty"){
 		
-		//Meteor.call("warriorSetPosition", gameId, warrior.label, cellToMove.position);
-		return "You can move";
+		Meteor.call("warriorSetPosition", gameId, warrior.label, cellToMove);
+		return "You moved";
 	}
 	else{
 	
 		otherWarrior = cellType.warrior;
-		return "There is a warrior there";
+		if(!(_.isUndefined(_.find(playerWarriors, function (warrior) { return warrior.position == otherWarrior.position;}))){
+			return "Cannot move to that direction. (your warrior)";
+		}
+		else{
+			return "Should attack";
+		}
 	}
-	
-	/*
-	
-    if (newR < 0 || newR >= game.boardSize || newC < 0 || newC >= game.boardSize) {
-        return "Cannot move to that direction. (out of bound)";
-    }
-
-    var newPosition = newR*game.boardSize + newC;
-    if (game.board[newPosition] == 0) {
-        return "Cannot move to that direction. (empty)";
-    }
-
-    // see if another warrior is in that position
-
-    var anotherWarrior = _.find(playerWarriors, function (warrior){
-        return warrior.position == newPosition;
-    });
-
-    if (anotherWarrior != undefined) {
-        return "You have a warrior in that position.";
-    }
-
-    for (player in game.players) {
-        for (warrior in player.warriors) {
-            if (warrior.position == newPosition) {
-                // TODO: should attack
-                // and should return
-            }
-        }
-    }
-	*/ // I think we can remove this part now
-
-    // move
 }

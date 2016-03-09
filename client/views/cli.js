@@ -74,15 +74,19 @@ function create(gameId, elements, coordination) {
 }
 
 function move(gameId, label, direction) {
+
     var game = Games.findOne({_id: gameId});
-    var playerWarriors = _.find(game.players, function (player) {
+    
+	/*var playerWarriors = _.find(game.players, function (player) {
         return player.userId == Meteor.userId();
     }).warriors;
 
     // get the warrior with the specified label
     var warrior = _.find(playerWarriors, function (warrior) {
         return warrior.label == label;
-    });
+    });*/
+	
+	var warrior = Warrior.getWarrior(gameId, Meteor.userId(), label);
 
     if (warrior == undefined) {
         return "No warrior with this label.";
@@ -99,10 +103,9 @@ function move(gameId, label, direction) {
 	if(cellType.type == "wall"){
 		return "Cannot move to that direction. (wall)";
 	}
+	
 	else if(cellType.type == "empty"){
-		
 		Meteor.call("warriorSetPosition", gameId, warrior.label, cellToMove);
-		return "You moved";
 	}
 	else{
 	

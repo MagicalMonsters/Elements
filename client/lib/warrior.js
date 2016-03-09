@@ -16,3 +16,18 @@ Warrior.type = function(composition){
 	}
 	return index;
 }
+
+Warrior.getWarrior = function(gameId , userid , label){
+
+	var game = Games.findOne({_id: gameId});
+    var playerWarriors = _.find(game.players, function (player) {
+        return player.userId == userid;
+    }).warriors;
+
+    // get the warrior with the specified label
+    var warrior = _.find(playerWarriors, function (warrior) {
+        return warrior.label == label;
+    });
+
+	return warrior;
+}

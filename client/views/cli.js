@@ -107,7 +107,7 @@ function move(gameId, label, direction) {
 	else{
 	
 		otherWarrior = cellType.warrior;
-		if(!(_.isUndefined(_.find(playerWarriors, function (warrior) { return warrior.position == otherWarrior.position;}))){
+		if(!(_.isUndefined(_.find(playerWarriors, function (warrior) { return warrior.position == otherWarrior.position;})))){
 			return "Cannot move to that direction. (your warrior)";
 		}
 		else{

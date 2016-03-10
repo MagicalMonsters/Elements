@@ -1,7 +1,6 @@
 <template name="game">
 	{{#if isStarted}}
 		{{>board game}}
-        {{>cli game}}
 	{{/if}}
     <a href="/">back</a>
     <h3>hello</h3>
@@ -13,4 +12,7 @@
     {{#if canStart}}
         <a id="start-btn" href="#">start</a>
     {{/if}}
+	{{#if isStarted}}
+		{{>cli game}}
+	{{/if}}
 </template>

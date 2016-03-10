@@ -128,6 +128,5 @@ function attack(gameId, warrior1, warrior2){
 		Meteor.call("deleteWarrior", Meteor.userId(), otherId, warrior1.label);
 	}
 	
-	
 	return result.message;
 }

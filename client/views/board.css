@@ -1,6 +1,7 @@
 table.board {
 	border: 10px solid black;
 	border-spacing: 0px;
+	float: right;
 }
 
 td.cell {

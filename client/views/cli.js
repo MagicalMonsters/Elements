@@ -130,3 +130,10 @@ function attack(gameId, warrior1, warrior2){
 	
 	return result.message;
 }
+
+function end(gameId) {
+    // give all the player's warriors their resources
+    
+
+    // increment the number of turns
+}

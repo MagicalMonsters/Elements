@@ -30,6 +30,25 @@ Meteor.methods({
 	},
 	
 	'warriorSetComposition': function(gameId , userId , warriorLabel, composition){
+		var game  = Games.findOne({_id: gameId});
+		var warriors = _.find(game.players, function(player){return player.userId == userId;}).warriors;
+        
+		for(var i=0;i<warriors.length;i++){
+			if(warriors[i].label == warriorLabel){
+				warriors[i].composition = composition;
+				break;
+			}
+		}
 		
-	}
+		Games.update({_id: gameId, "players.userId":  userId}, {
+             $set: {"players.$.warriors": warriors}
+        });
+	},
+	
+	'deleteWarrior': function (gameId , userId , warriorLabel) {
+        Games.update({_id: gameId, "players.userId": userId}, {
+             $set: {"players.$.warriors": []
+             }
+        });
+    },
 });

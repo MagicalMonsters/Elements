@@ -25,9 +25,25 @@ Warrior.getWarrior = function(gameId , userid , label){
     }).warriors;
 
     // get the warrior with the specified label
-    var warrior = _.find(playerWarriors, function (warrior) {
+    return _.find(playerWarriors, function (warrior) {
         return warrior.label == label;
     });
 
-	return warrior;
+}
+
+Warrior.getWarriors = function(gameId, userid){
+	var game = Games.findOne({_id: gameId});
+    return _.find(game.players, function (player) {
+        return player.userId == userid;
+    }).warriors;
+}
+
+Warrior.getOwner = function(gameId , position){
+	var game = Games.findOne({_id: gameId});
+	for(var i = 0;i<game.players.length; i++){
+		var Id = game.players[i].userId;
+		if(!(_.isUndefined(_.find(game.players[i].warriors, function (warrior) {return warrior.position == position; })))){
+			return Id;
+		}
+	}
 }

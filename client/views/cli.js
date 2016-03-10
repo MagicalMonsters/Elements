@@ -101,16 +101,33 @@ function move(gameId, label, direction) {
 	else{
 	
 		otherWarrior = cellType.warrior;
-		if(!(_.isUndefined(_.find(playerWarriors, function (warrior) { return warrior.position == otherWarrior.position;})))){
+		if(!(_.isUndefined(_.find(Warrior.getWarriors(gameId,Meteor.userId()), function (warrior) { return warrior.position == otherWarrior.position;})))){
 			return "Cannot move to that direction. (your warrior)";
 		}
 		else{
 			return attack(gameId, warrior, otherWarrior);
-			return "Should attack";
 		}
 	}
 }
 
 function attack(gameId, warrior1, warrior2){
+
+	var result = Logic.calculateAttack(warrior1.composition, warrior2.composition);
 	
+	var otherId = Warrior.getOwner(gameId,warrior2.position);
+	
+	Meteor.call("warriorSetComposition", gameId, Meteor.userId() , warrior1.label, result.composition1);
+	Meteor.call("warriorSetComposition", gameId, otherId , warrior2.label, result.composition2);
+	
+	if( _.reduce(result.composition2, function(memo, num){ return memo + num; }, 0) == 0 ){ // Defender died
+		
+		Meteor.call("deleteWarrior", gameId, otherId, warrior2.label);
+		Meteor.call("warriorSetPosition", gameId, warrior1.label, warrior2.position);
+	}
+	if( _.reduce(result.composition1, function(memo, num){ return memo + num; }, 0) == 0 ){ //Attacker died
+		Meteor.call("deleteWarrior", Meteor.userId(), otherId, warrior1.label);
+	}
+	
+	
+	return result.message;
 }

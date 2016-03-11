@@ -146,4 +146,5 @@ function end(gameId){
 	}
 	
 	Meteor.call("endTurn", gameId , Meteor.userId() , game.turn+1);
+
 }

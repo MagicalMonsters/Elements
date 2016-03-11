@@ -46,10 +46,13 @@ Meteor.methods({
 	},
 	
 	'deleteWarrior': function (gameId , userId , warriorLabel) {
-	
+
+        var game = Games.findOne({_id: gameId});
+        var warriors = _.find(game.players, function (player) {return player.userId == userId;}).warriors;
+        var newWarriors = _.select(warriors, function (warrior){return warrior.lable != warriorLabel;});
+
         Games.update({_id: gameId, "players.userId": userId}, {
-             $set: {"players.$.warriors": []
-             }
+             $set: {"players.$.warriors": newWarriors}
         });
     },
 	

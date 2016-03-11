@@ -34,6 +34,11 @@ function parse(gameId, command) {
         return "";
     }
     var action = tokens[0].toLowerCase();
+	
+	if(!isMyTurn(gameId)){
+		return "This is not your turn";
+	}
+	
     if (action == "create") {
         return create(gameId, tokens[1], tokens[2]);
     } else if (action == "move") {
@@ -43,7 +48,7 @@ function parse(gameId, command) {
     } else if (action == "split") {
         return split(gameId, tokens[1], tokens[2]);
     } else if (action == "end") {
-        return end(gameId);
+        Meteor.call("endTurn", gameId , Meteor.userId());
     } else {
         return "unknown command!";
     }
@@ -63,6 +68,11 @@ function create(gameId, elements, coordination) {
     }
     
     var game = Games.findOne({_id: gameId});
+	
+	if(game.turn >= game.players.length){
+		return "You can create only at first turn";
+	}
+	
     coordination = coordination.split(",");
     var boardCellIndex = parseInt(coordination[1]) + parseInt(coordination[0])*game.boardSize;
 	
@@ -77,11 +87,19 @@ function move(gameId, label, direction) {
 
     var game = Games.findOne({_id: gameId});
 	
+	if(game.turn < game.players.length){
+		return "You can't move at first turn";
+	}
+	
 	var warrior = Warrior.getWarrior(gameId, Meteor.userId(), label);
 
     if (warrior == undefined) {
         return "No warrior with this label.";
     }
+	
+	if(!canMove(warrior)){
+		return "You can't move any more in this turn";
+	}
     
 	var cellToMove = Board.directionOfCell(game, warrior.position, direction);
 	
@@ -96,7 +114,8 @@ function move(gameId, label, direction) {
 	}
 	
 	else if(cellType.type == "empty"){
-		Meteor.call("warriorSetPosition", gameId, warrior.label, cellToMove);
+		Meteor.call("warriorActs", gameId, Meteor.userId() , warrior.label);
+		Meteor.call("warriorSetPosition", gameId, Meteor.userId(), warrior.label, cellToMove);
 	}
 	else{
 	
@@ -105,6 +124,7 @@ function move(gameId, label, direction) {
 			return "Cannot move to that direction. (your warrior)";
 		}
 		else{
+			Meteor.call("warriorActs", gameId, Meteor.userId() , warrior1.label);
 			return attack(gameId, warrior, otherWarrior);
 		}
 	}
@@ -131,8 +151,8 @@ function attack(gameId, warrior1, warrior2){
 	return result.message;
 }
 
-function end(gameId){
-	
+function isMyTurn(gameId){
+
 	var game = Games.findOne({_id: gameId});
 	var index;
 	for(index = 0; index < game.players.length; index++){
@@ -142,9 +162,16 @@ function end(gameId){
 	}
 	
 	if(game.turn % game.players.length != index){
-		return "This is not your turn";
+		return false;
 	}
 	
-	Meteor.call("endTurn", gameId , Meteor.userId() , game.turn+1);
+	return true;
+}
 
+function canMove(warrior){
+
+	if(warrior.moves < 1){
+		return true;
+	}
+	return false;
 }

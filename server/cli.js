@@ -13,9 +13,9 @@ Meteor.methods({
         });
     },
 	
-	'warriorSetPosition': function (gameId, warriorLabel, position) {
+	'warriorSetPosition': function (gameId, userId, warriorLabel, position) {
         var game  = Games.findOne({_id: gameId});
-		var warriors = _.find(game.players, function(player){return player.userId == Meteor.userId();}).warriors;
+		var warriors = _.find(game.players, function(player){return player.userId == userId;}).warriors;
         
 		for(var i=0;i<warriors.length;i++){
 			if(warriors[i].label == warriorLabel){
@@ -24,12 +24,28 @@ Meteor.methods({
 			}
 		}
 		
-		Games.update({_id: gameId, "players.userId":  Meteor.userId()}, {
+		Games.update({_id: gameId, "players.userId": userId}, {
              $set: {"players.$.warriors": warriors}
         });
 	},
 	
-	'warriorSetComposition': function(gameId , userId , warriorLabel, composition){
+	'warriorActs': function (gameId, userId, warriorLabel){
+		var game  = Games.findOne({_id: gameId});
+		var warriors = _.find(game.players, function(player){return player.userId == userId;}).warriors;
+        
+		for(var i=0;i<warriors.length;i++){
+			if(warriors[i].label == warriorLabel){
+				warriors[i].moves++;
+				break;
+			}
+		}
+		
+		Games.update({_id: gameId, "players.userId":  userId}, {
+             $set: {"players.$.warriors": warriors}
+        });
+	},
+	
+	'warriorSetComposition': function (gameId , userId , warriorLabel, composition){
 		var game  = Games.findOne({_id: gameId});
 		var warriors = _.find(game.players, function(player){return player.userId == userId;}).warriors;
         
@@ -63,6 +79,8 @@ Meteor.methods({
         
 		for(var i=0;i<warriors.length;i++){
 			warriors[i].backpack[ game.board[warriors[i].position] - 1 ] += 100;
+			warriors[i].turnsToReincarnation = Math.max(warriors[i].turnsToReincarnation - 1 , 0);
+			warriors[i].moves = 0;
 		}
 		
 		Games.update({_id: gameId, "players.userId":  userId}, {
@@ -70,7 +88,8 @@ Meteor.methods({
         });
 	
 		Games.update({_id: gameId}, {
-            $set: {"turn": turn }
+            $set: {"turn": game.turn+1 }
         });
-	}
+	},
+	
 });

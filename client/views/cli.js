@@ -125,8 +125,25 @@ function attack(gameId, warrior1, warrior2){
 		Meteor.call("warriorSetPosition", gameId, warrior1.label, warrior2.position);
 	}
 	if( _.reduce(result.composition1, function(memo, num){ return memo + num; }, 0) == 0 ){ //Attacker died
-		Meteor.call("deleteWarrior", Meteor.userId(), otherId, warrior1.label);
+		Meteor.call("deleteWarrior", gameId, Meteor.userId(), warrior1.label);
 	}
 	
 	return result.message;
+}
+
+function end(gameId){
+	
+	var game = Games.findOne({_id: gameId});
+	var index;
+	for(index = 0; index < game.players.length; index++){
+		if(game.players[index].userId == Meteor.userId()){
+			break;
+		}
+	}
+	
+	if(game.turn % game.players.length != index){
+		return "This is not your turn";
+	}
+	
+	Meteor.call("endTurn", gameId , Meteor.userId() , game.turn+1);
 }

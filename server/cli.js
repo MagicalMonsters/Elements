@@ -46,9 +46,28 @@ Meteor.methods({
 	},
 	
 	'deleteWarrior': function (gameId , userId , warriorLabel) {
+	
         Games.update({_id: gameId, "players.userId": userId}, {
              $set: {"players.$.warriors": []
              }
         });
     },
+	
+	'endTurn' : function (gameId, userId ,turn){
+	
+		var game  = Games.findOne({_id: gameId});
+		var warriors = _.find(game.players, function(player){return player.userId == userId;}).warriors;
+        
+		for(var i=0;i<warriors.length;i++){
+			warriors[i].backpack[ game.board[warriors[i].position] - 1 ] += 100;
+		}
+		
+		Games.update({_id: gameId, "players.userId":  userId}, {
+             $set: {"players.$.warriors": warriors}
+        });
+	
+		Games.update({_id: gameId}, {
+            $set: {"turn": turn }
+        });
+	}
 });

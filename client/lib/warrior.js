@@ -17,6 +17,13 @@ Warrior.type = function(composition){
 	return index;
 }
 
+Warrior.color = function(composition){
+    var colors = ['black', 'brown', 'blue', 'red', 'green'];
+    var res = Warrior.type(composition);
+    res++;
+    return colors[res];
+}
+
 Warrior.getWarrior = function(gameId , userid , label){
 
 	var game = Games.findOne({_id: gameId});

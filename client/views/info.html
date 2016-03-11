@@ -1,0 +1,10 @@
+<template name="info">
+    <div class="info-box">
+        <h3>Your warriors</h3>
+        <ul>
+            {{#each warriors}}
+            <li style="color:{{color}};">{{label}}&nbsp; comp: {{composition}} &nbsp; back:{{backpack}}</li>
+            {{/each}}
+        </ul>
+    </div>
+</template>

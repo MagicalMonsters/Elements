@@ -175,3 +175,28 @@ function canMove(warrior){
 	}
 	return false;
 }
+
+function add(gameId, label, elements){
+	var game = Games.findOne({_id: gameId});
+	var elems = elements.split(",");
+	elems = _(elems).map(function (elem) {
+        return parseInt(elem);
+    });
+	var warrior = Warrior.getWarrior(gameId, Meteor.userId(), label);
+	if (warrior == undefined) {
+        return "No warrior with this label.";
+    }
+	var newBackpack = warrior.backpack;
+	if(warrior.turnsToReincarnation > 0){
+		return "You can't reincarnat yet";
+	}
+	for(var i = 0;i<elems.length;i++){
+		if(elems[i] > warrior.backpack[i]){
+			return "This is more than what you have in backpack";
+		}
+		newBackpack[i] -= elems[i];
+		elems[i] += warrior.composition[i];
+	}
+	
+	Meteor.call("warriorSetComposition", gameId, Meteor.userId() , label, elems, true , newBackpack);
+}

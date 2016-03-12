@@ -8,6 +8,7 @@ Meteor.methods({
                                             turnsToReincarnation: 6,
                                             moves: 0,
                                             label: 'A',
+											canSplit: false,
                                             }]
              }
         });
@@ -45,13 +46,18 @@ Meteor.methods({
         });
 	},
 	
-	'warriorSetComposition': function (gameId , userId , warriorLabel, composition){
+	'warriorSetComposition': function (gameId , userId , warriorLabel, composition , resetReincarnation = false , newBackpack = []){
 		var game  = Games.findOne({_id: gameId});
 		var warriors = _.find(game.players, function(player){return player.userId == userId;}).warriors;
         
 		for(var i=0;i<warriors.length;i++){
 			if(warriors[i].label == warriorLabel){
 				warriors[i].composition = composition;
+				if(resetReincarnation){
+					warriors[i].turnsToReincarnation = 7;
+					warriors[i].backpack = newBackpack;
+					warriors[i].canSplit = true;
+				}
 				break;
 			}
 		}
@@ -81,6 +87,7 @@ Meteor.methods({
 			warriors[i].backpack[ game.board[warriors[i].position] - 1 ] += 100;
 			warriors[i].turnsToReincarnation = Math.max(warriors[i].turnsToReincarnation - 1 , 0);
 			warriors[i].moves = 0;
+			warriors[i].canSplit = false;
 		}
 		
 		Games.update({_id: gameId, "players.userId":  userId}, {
@@ -91,5 +98,4 @@ Meteor.methods({
             $set: {"turn": game.turn+1 }
         });
 	},
-	
 });

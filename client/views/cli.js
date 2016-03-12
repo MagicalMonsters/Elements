@@ -44,7 +44,7 @@ function parse(gameId, command) {
     } else if (action == "move") {
         return move(gameId, tokens[1], tokens[2]);
     } else if (action == "add") {
-        return add(gameId, tokens[1]);    
+        return add(gameId, tokens[1], tokens[2]);    
     } else if (action == "split") {
         return split(gameId, tokens[1], tokens[2]);
     } else if (action == "end") {
@@ -124,7 +124,7 @@ function move(gameId, label, direction) {
 			return "Cannot move to that direction. (your warrior)";
 		}
 		else{
-			Meteor.call("warriorActs", gameId, Meteor.userId() , warrior1.label);
+			Meteor.call("warriorActs", gameId, Meteor.userId() , warrior.label);
 			return attack(gameId, warrior, otherWarrior);
 		}
 	}

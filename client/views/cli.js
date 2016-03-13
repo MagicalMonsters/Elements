@@ -46,7 +46,7 @@ function parse(gameId, command) {
     } else if (action == "add") {
         return add(gameId, tokens[1], tokens[2]);    
     } else if (action == "split") {
-        return split(gameId, tokens[1], tokens[2]);
+		return spliting(gameId, tokens[1], tokens[2], tokens[3]);
     } else if (action == "end") {
         Meteor.call("endTurn", gameId , Meteor.userId());
     } else {
@@ -88,7 +88,7 @@ function create(gameId, elements, coordination) {
 		return "Not a valid position";
 	}
 
-    Meteor.call("createWarrior", gameId, boardCellIndex, elems);
+    Meteor.call("createWarrior", gameId, Meteor.userId(), boardCellIndex, elems);
 }
 
 function move(gameId, label, direction) {
@@ -207,4 +207,55 @@ function add(gameId, label, elements){
 	}
 	
 	Meteor.call("warriorSetComposition", gameId, Meteor.userId() , label, elems, true , newBackpack);
+}
+
+function spliting(gameId, label, elements, direction){
+	var game = Games.findOne({_id: gameId});
+	
+	var elems = elements.split(",");
+	elems = _(elems).map(function (elem) {
+        return parseInt(elem);
+    });
+	
+	var warrior = Warrior.getWarrior(gameId, Meteor.userId(), label);
+
+    if (warrior == undefined) {
+        return "No warrior with this label";
+    }
+	
+	if( !warrior.canSplit ) {
+		return "you can't split yet";
+	}
+	
+	var newComp = warrior.composition;
+	
+	for(var i = 0;i<elems.length;i++){
+		if(elems[i] > warrior.composition[i]){
+			return "This is more than what you have in composition";
+		}
+		newComp[i] -= elems[i];
+	}
+    
+	var cellToMove = Board.directionOfCell(game, warrior.position, direction);
+	
+	if( cellToMove < -50 ) {
+		return "Invalid direction";
+	}
+	
+	var cellType = Board.cellType(game, cellToMove);
+	
+	if(cellType.type != "empty"){
+		return "You can't move to that direction";
+	}
+	
+	if(_.reduce(elems, function(memo, num){ return memo + num; }, 0) != 0 ){
+		Meteor.call("createWarrior", gameId, Meteor.userId(), cellToMove, elems);
+	}
+	
+	if( _.reduce(newComp, function(memo, num){ return memo + num; }, 0) == 0 ){
+		Meteor.call("deleteWarrior", gameId, Meteor.userId(), label);
+	}
+	else{
+		Meteor.call("warriorSetComposition", gameId, Meteor.userId() , label, newComp);
+	}
 }

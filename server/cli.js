@@ -1,9 +1,10 @@
 Meteor.methods({
-    'createWarrior': function (gameId, position, elems) {
+    'createWarrior': function (gameId, userId, position, elems) {
+		
 		
 		var game  = Games.findOne({_id: gameId});
 		var l = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		var warriors = _.find(game.players, function(player){return player.userId == Meteor.userId();}).warriors;
+		var warriors = _.find(game.players, function(player){return player.userId == userId;}).warriors;
 		var i;
 		for(i = 0;i<l.length;i++){
 			if(_.isUndefined(_.find(warriors, function(warrior){return warrior.label == l[i];} )) ){
@@ -21,7 +22,7 @@ Meteor.methods({
 						canSplit: false,
                         });
 		
-		Games.update({_id: gameId, "players.userId": Meteor.userId()}, {
+		Games.update({_id: gameId, "players.userId": userId}, {
              $set: {"players.$.warriors": warriors}
         });
     },
@@ -80,10 +81,12 @@ Meteor.methods({
 	},
 	
 	'deleteWarrior': function (gameId , userId , warriorLabel) {
+	
+		console.log("trying to delete");
 
         var game = Games.findOne({_id: gameId});
         var warriors = _.find(game.players, function (player) {return player.userId == userId;}).warriors;
-        var newWarriors = _.select(warriors, function (warrior){return warrior.lable != warriorLabel;});
+        var newWarriors = _.filter(warriors, function (warrior){return warrior.lable != warriorLabel;});
 
         Games.update({_id: gameId, "players.userId": userId}, {
              $set: {"players.$.warriors": newWarriors}

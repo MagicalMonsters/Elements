@@ -56,6 +56,9 @@ function parse(gameId, command) {
 
 
 function create(gameId, elements, coordination) {
+
+	var game = Games.findOne({_id: gameId});
+
     var elems = elements.split(",");
     elems = _(elems).map(function (elem) {
         return parseInt(elem);
@@ -63,11 +66,16 @@ function create(gameId, elements, coordination) {
     var sum = _(elems).reduce(function (memo, num) {
         return memo + num;
     }, 0);
+	
+	var warriors = _.find(game.players, function(player){return player.userId == Meteor.userId();}).warriors;
+	
+	if(warriors.length > 0){
+		return "You can't create more than one warrior";
+	}
+	
     if (sum != 2000) {
         return "The sum should be 2000";
     }
-    
-    var game = Games.findOne({_id: gameId});
 	
 	if(game.turn >= game.players.length){
 		return "You can create only at first turn";

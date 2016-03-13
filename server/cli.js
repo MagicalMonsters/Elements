@@ -1,16 +1,28 @@
 Meteor.methods({
     'createWarrior': function (gameId, position, elems) {
-        Games.update({_id: gameId, "players.userId": Meteor.userId()}, {
-             $set: {"players.$.warriors": [{
-                                            position: position,
-                                            composition: elems,
-                                            backpack: [0,0,0,0],
-                                            turnsToReincarnation: 6,
-                                            moves: 0,
-                                            label: 'A',
-											canSplit: false,
-                                            }]
-             }
+		
+		var game  = Games.findOne({_id: gameId});
+		var l = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		var warriors = _.find(game.players, function(player){return player.userId == Meteor.userId();}).warriors;
+		var i;
+		for(i = 0;i<l.length;i++){
+			if(_.isUndefined(_.find(warriors, function(warrior){return warrior.label == l[i];} )) ){
+				break;
+			}
+		}
+		
+		warriors.push({
+                        position: position,
+                        composition: elems,
+                        backpack: [0,0,0,0],
+                        turnsToReincarnation: 6,
+                        moves: 0,
+                        label: l[i],
+						canSplit: false,
+                        });
+		
+		Games.update({_id: gameId, "players.userId": Meteor.userId()}, {
+             $set: {"players.$.warriors": warriors}
         });
     },
 	

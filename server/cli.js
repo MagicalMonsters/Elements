@@ -81,15 +81,18 @@ Meteor.methods({
 	},
 	
 	'deleteWarrior': function (gameId , userId , warriorLabel) {
-	
-		console.log("trying to delete");
 
         var game = Games.findOne({_id: gameId});
         var warriors = _.find(game.players, function (player) {return player.userId == userId;}).warriors;
-        var newWarriors = _.filter(warriors, function (warrior){return warrior.lable != warriorLabel;});
-
+		var warriorIndex;
+		for(var i=0;i<warriors.length;i++){
+			if(warriors[i].label == warriorLabel){
+				warriorIndex = i;
+			}
+		}
+		warriors.splice(warriorIndex, 1);
         Games.update({_id: gameId, "players.userId": userId}, {
-             $set: {"players.$.warriors": newWarriors}
+             $set: {"players.$.warriors": warriors}
         });
     },
 	

@@ -3,6 +3,9 @@
         <input name="command" type="text">
         <button type="submit" {{isMyTurn}}>GO</button>
     </form>
+    <form id="end_turn">
+        <button type="submit" {{isMyTurn}}>end</button>
+    </form>
     <span id="cli_log" style="color:{{color}};">
         {{log}}
     </span>

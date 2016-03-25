@@ -1,0 +1,10 @@
+#end_turn button {
+    margin-top: 25px;
+    height: 25px;
+    width: 70px;
+}
+
+#cli_log {
+    margin-top: 25px;
+    margin-left: 10px;
+}

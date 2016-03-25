@@ -14,9 +14,14 @@ Template.cli.events({
     'submit form#cli_form': function (e, tpl) {
         e.preventDefault();
         var command = tpl.$('input[name=command]').val();
-        console.log(command);
         var log = parse(this.gameId, command);
-        Session.set("log",log);
+        Session.set("log", log);
+    },
+
+    'submit form#end_turn': function (e, tpl) {
+        e.preventDefault();
+        var log = parse(this.gameId, "end");
+        Session.set("log", log);
     }
 });
 
@@ -98,7 +103,7 @@ function create(gameId, elements, coordination) {
 	}
     Session.set("inProgress", Session.get("inProgress") + 1);
     Meteor.call("createWarrior", gameId, Meteor.userId(), boardCellIndex, elems, function (error, result) {
-        Session.set("isInProgress", Session.get("isInProgress") - 1);
+        Session.set("inProgress", Session.get("inProgress") - 1);
     });
 }
 

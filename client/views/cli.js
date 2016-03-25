@@ -173,7 +173,7 @@ function attack(gameId, warrior1, warrior2){
 		
 		var newPos = warrior2.position;
 		var newbackpack = warrior2.backpack;
-		_.map(newbackpack, function(num, index){ return num + warrior1.backpack[index]; });
+		newbackpack = _.map(newbackpack, function(num, index){ return num + warrior1.backpack[index]; });
         Session.set("inProgress", Session.get("inProgress") + 1);
 		Meteor.call("deleteWarrior", gameId, otherId, warrior2.label, function (error, result) {
             Session.set("inProgress", Session.get("inProgress") - 1);

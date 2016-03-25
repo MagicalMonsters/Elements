@@ -21,6 +21,11 @@ Template.cli.events({
 });
 
 function parse(gameId, command) {
+
+    if (Session.get("isInProgress") === true) {
+        return;
+    }
+
     if (_.isEmpty(command)) {
         return "";
     }
@@ -33,6 +38,7 @@ function parse(gameId, command) {
 	if(!Logic.isMyTurn(gameId, Meteor.userId())){
 		return "This is not your turn";
 	}
+
 	
     if (action == "create") {
         return create(gameId, tokens[1], tokens[2]);
@@ -43,7 +49,10 @@ function parse(gameId, command) {
     } else if (action == "split") {
 		return spliting(gameId, tokens[1], tokens[2], tokens[3]);
     } else if (action == "end") {
-        Meteor.call("endTurn", gameId , Meteor.userId());
+        Session.set("isInProgress", true);
+        Meteor.call("endTurn", gameId , Meteor.userId(), function (error, result) {
+            Session.set("isInProgress", false);
+        });
     } else {
         return "unknown command!";
     }

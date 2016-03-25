@@ -1,7 +1,6 @@
 Template.info.helpers({
     warriors: function () {
-        var game = Games.findOne({_id: this.gameId});
-        var warriors = _.find(game.players, function(player) {return player.userId==Meteor.userId();}).warriors;
+        var warriors = Warrior.getWarriors(this.gameId, Meteor.userId());
         return _.map(warriors, function(warrior) {
             return {
                 label: warrior.label,
@@ -12,6 +11,5 @@ Template.info.helpers({
                 turnsToReincarnation: warrior.turnsToReincarnation,
             };
         });
-
     }
 });

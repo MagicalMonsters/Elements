@@ -43,3 +43,20 @@ Logic.calculateAttack = function (composition1, composition2){
 		return { "message": "Defender Win", "composition1" : newComp, "composition2" : composition2};
 	}
 }
+
+Logic.isMyTurn = function (gameId, userId){
+
+	var game = Games.findOne({_id: gameId});
+	var index;
+	for(index = 0; index < game.players.length; index++){
+		if(game.players[index].userId == userId){
+			break;
+		}
+	}
+	
+	if(game.turn % game.players.length != index){
+		return false;
+	}
+	
+	return true;
+}

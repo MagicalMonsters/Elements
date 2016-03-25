@@ -67,9 +67,11 @@ Meteor.methods({
 		for(var i=0;i<warriors.length;i++){
 			if(warriors[i].label == warriorLabel){
 				warriors[i].composition = composition;
-				if(resetReincarnation){
-					warriors[i].turnsToReincarnation = 7;
+				if(newBackpack.length == 4){
 					warriors[i].backpack = newBackpack;
+				}
+				if(resetReincarnation){
+					warriors[i].turnsToReincarnation = 6;
 					warriors[i].canSplit = true;
 				}
 				break;

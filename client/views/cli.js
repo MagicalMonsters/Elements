@@ -1,13 +1,6 @@
 Template.cli.helpers({
     isMyTurn: function () {
-		// return "disabled";
-        var gameId = this.gameId;
-        var game = Games.findOne({_id: gameId});
-        var myIndex = _.findIndex(game.players, function (player){
-            return player.userId == Meteor.userId();
-        });
-        console.log("myIndex:" + myIndex);
-        return (myIndex == game.turn) ? "enabled" : "disabled";
+        return (Logic.isMyTurn(this.gameId, Meteor.userId())) ? "enabled" : "disabled";
     },
     log: function () {
         return Session.get("log") ? Session.get("log") : "Success";
@@ -37,7 +30,7 @@ function parse(gameId, command) {
     }
     var action = tokens[0].toLowerCase();
 	
-	if(!isMyTurn(gameId)){
+	if(!Logic.isMyTurn(gameId, Meteor.userId())){
 		return "This is not your turn";
 	}
 	
@@ -146,36 +139,25 @@ function attack(gameId, warrior1, warrior2){
 	
 	var otherId = Warrior.getOwner(gameId,warrior2.position);
 	
-	Meteor.call("warriorSetComposition", gameId, Meteor.userId() , warrior1.label, result.composition1);
-	Meteor.call("warriorSetComposition", gameId, otherId , warrior2.label, result.composition2);
-	
 	if( _.reduce(result.composition2, function(memo, num){ return memo + num; }, 0) == 0 ){ // Defender died
 		
+		var newPos = warrior2.position;
+		var newbackpack = warrior2.backpack;
+		_.map(newbackpack, function(num, index){ return num + warrior1.backpack[index]; })
 		Meteor.call("deleteWarrior", gameId, otherId, warrior2.label);
-		Meteor.call("warriorSetPosition", gameId, warrior1.label, warrior2.position);
+		Meteor.call("warriorSetPosition", gameId, warrior1.label, newPos);
+		Meteor.call("warriorSetComposition", gameId, Meteor.userId() , warrior1.label, result.composition1 , false, newbackpack);
 	}
-	if( _.reduce(result.composition1, function(memo, num){ return memo + num; }, 0) == 0 ){ //Attacker died
+	else if( _.reduce(result.composition1, function(memo, num){ return memo + num; }, 0) == 0 ){ //Attacker died
 		Meteor.call("deleteWarrior", gameId, Meteor.userId(), warrior1.label);
+		Meteor.call("warriorSetComposition", gameId, otherId , warrior2.label, result.composition2);
+	}
+	else {
+		Meteor.call("warriorSetComposition", gameId, Meteor.userId() , warrior1.label, result.composition1);
+		Meteor.call("warriorSetComposition", gameId, otherId , warrior2.label, result.composition2);
 	}
 	
 	return result.message;
-}
-
-function isMyTurn(gameId){
-
-	var game = Games.findOne({_id: gameId});
-	var index;
-	for(index = 0; index < game.players.length; index++){
-		if(game.players[index].userId == Meteor.userId()){
-			break;
-		}
-	}
-	
-	if(game.turn % game.players.length != index){
-		return false;
-	}
-	
-	return true;
 }
 
 function canMove(warrior){

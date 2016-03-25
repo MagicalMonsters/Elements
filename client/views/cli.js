@@ -22,7 +22,12 @@ Template.cli.events({
 
 function parse(gameId, command) {
 
-    if (Session.get("isInProgress") === true) {
+    var inProgress = Session.get("inProgress");
+    if (inProgress == undefined) {
+        Session.set("inProgress", 0);
+    }
+
+    if (inProgress != 0) {
         return;
     }
 
@@ -49,9 +54,9 @@ function parse(gameId, command) {
     } else if (action == "split") {
 		return spliting(gameId, tokens[1], tokens[2], tokens[3]);
     } else if (action == "end") {
-        Session.set("isInProgress", true);
+        Session.set("inProgress", Session.get("inProgress") + 1);
         Meteor.call("endTurn", gameId , Meteor.userId(), function (error, result) {
-            Session.set("isInProgress", false);
+            Session.set("inProgress", Session.get("inProgress") - 1);
         });
     } else {
         return "unknown command!";
@@ -91,8 +96,10 @@ function create(gameId, elements, coordination) {
 	if( Board.cellType(game, boardCellIndex).type != "empty" ) {
 		return "Not a valid position";
 	}
-
-    Meteor.call("createWarrior", gameId, Meteor.userId(), boardCellIndex, elems);
+    Session.set("inProgress", Session.get("inProgress") + 1);
+    Meteor.call("createWarrior", gameId, Meteor.userId(), boardCellIndex, elems, function (error, result) {
+        Session.set("isInProgress", Session.get("isInProgress") - 1);
+    });
 }
 
 function move(gameId, label, direction) {
@@ -126,8 +133,14 @@ function move(gameId, label, direction) {
 	}
 	
 	else if(cellType.type == "empty"){
-		Meteor.call("warriorActs", gameId, Meteor.userId() , warrior.label);
-		Meteor.call("warriorSetPosition", gameId, Meteor.userId(), warrior.label, cellToMove);
+        Session.set("inProgress", Session.get("inProgress") + 1);
+		Meteor.call("warriorActs", gameId, Meteor.userId() , warrior.label, function (error, result) {
+            Session.set("inProgress", Session.get("inProgress") - 1);
+        });
+        Session.set("inProgress", Session.get("inProgress") + 1);
+		Meteor.call("warriorSetPosition", gameId, Meteor.userId(), warrior.label, cellToMove, function (error, result) {
+            Session.set("inProgress", Session.get("inProgress") - 1);
+        });
 	}
 	else{
 	
@@ -136,7 +149,10 @@ function move(gameId, label, direction) {
 			return "Cannot move to that direction. (your warrior)";
 		}
 		else{
-			Meteor.call("warriorActs", gameId, Meteor.userId() , warrior.label);
+            Session.set("inProgress", Session.get("inProgress") + 1);
+			Meteor.call("warriorActs", gameId, Meteor.userId() , warrior.label, function (error, result) {
+                Session.set("inProgress", Session.get("inProgress") - 1);
+            });
 			return attack(gameId, warrior, otherWarrior);
 		}
 	}
@@ -152,18 +168,43 @@ function attack(gameId, warrior1, warrior2){
 		
 		var newPos = warrior2.position;
 		var newbackpack = warrior2.backpack;
-		_.map(newbackpack, function(num, index){ return num + warrior1.backpack[index]; })
-		Meteor.call("deleteWarrior", gameId, otherId, warrior2.label);
-		Meteor.call("warriorSetPosition", gameId, warrior1.label, newPos);
-		Meteor.call("warriorSetComposition", gameId, Meteor.userId() , warrior1.label, result.composition1 , false, newbackpack);
+		_.map(newbackpack, function(num, index){ return num + warrior1.backpack[index]; });
+        Session.set("inProgress", Session.get("inProgress") + 1);
+		Meteor.call("deleteWarrior", gameId, otherId, warrior2.label, function (error, result) {
+            Session.set("inProgress", Session.get("inProgress") - 1);
+        });
+        Session.set("inProgress", Session.get("inProgress") + 1);
+		Meteor.call("warriorSetPosition", gameId, warrior1.label, newPos, function (error, result) {
+            Session.set("inProgress", Session.get("inProgress") - 1);
+        });
+        Session.set("inProgress", Session.get("inProgress") + 1);
+		Meteor.call("warriorSetComposition", gameId, Meteor.userId() , warrior1.label, result.composition1,
+            false, newbackpack, function (error, result) {
+                Session.set("inProgress", Session.get("inProgress") - 1);
+            });
 	}
 	else if( _.reduce(result.composition1, function(memo, num){ return memo + num; }, 0) == 0 ){ //Attacker died
-		Meteor.call("deleteWarrior", gameId, Meteor.userId(), warrior1.label);
-		Meteor.call("warriorSetComposition", gameId, otherId , warrior2.label, result.composition2);
+        Session.set("inProgress", Session.get("inProgress") + 1);
+		Meteor.call("deleteWarrior", gameId, Meteor.userId(), warrior1.label, function (error, result) {
+            Session.set("inProgress", Session.get("inProgress") - 1);
+        });
+        Session.set("inProgress", Session.get("inProgress") + 1);
+		Meteor.call("warriorSetComposition", gameId, otherId,
+            warrior2.label, result.composition2, function (error, result) {
+            Session.set("inProgress", Session.get("inProgress") - 1);
+        });
 	}
 	else {
-		Meteor.call("warriorSetComposition", gameId, Meteor.userId() , warrior1.label, result.composition1);
-		Meteor.call("warriorSetComposition", gameId, otherId , warrior2.label, result.composition2);
+        Session.set("inProgress", Session.get("inProgress") + 1);
+		Meteor.call("warriorSetComposition", gameId, Meteor.userId() ,warrior1.label,
+            result.composition1, function (error, result) {
+            Session.set("inProgress", Session.get("inProgress") - 1);
+        });
+        Session.set("inProgress", Session.get("inProgress") + 1);
+		Meteor.call("warriorSetComposition", gameId, otherId ,warrior2.label,
+            result.composition2, function (error, result) {
+            Session.set("inProgress", Session.get("inProgress") - 1);
+        });
 	}
 	
 	return result.message;
@@ -198,8 +239,12 @@ function add(gameId, label, elements){
 		newBackpack[i] -= elems[i];
 		elems[i] += warrior.composition[i];
 	}
-	
-	Meteor.call("warriorSetComposition", gameId, Meteor.userId() , label, elems, true , newBackpack);
+
+    Session.set("inProgress", Session.get("inProgress") + 1);
+	Meteor.call("warriorSetComposition", gameId, Meteor.userId() ,label, elems,true ,
+        newBackpack, function (error, result) {
+        Session.set("inProgress", Session.get("inProgress") - 1);
+    });
 }
 
 function spliting(gameId, label, elements, direction){
@@ -242,13 +287,22 @@ function spliting(gameId, label, elements, direction){
 	}
 	
 	if(_.reduce(elems, function(memo, num){ return memo + num; }, 0) != 0 ){
-		Meteor.call("createWarrior", gameId, Meteor.userId(), cellToMove, elems);
+        Session.set("inProgress", Session.get("inProgress") + 1);
+		Meteor.call("createWarrior", gameId, Meteor.userId(), cellToMove, elems, function (error, result) {
+            Session.set("inProgress", Session.get("inProgress") - 1);
+        });
 	}
 	
 	if( _.reduce(newComp, function(memo, num){ return memo + num; }, 0) == 0 ){
-		Meteor.call("deleteWarrior", gameId, Meteor.userId(), label);
+        Session.set("inProgress", Session.get("inProgress") + 1);
+		Meteor.call("deleteWarrior", gameId, Meteor.userId(), label, function (error, result) {
+            Session.set("inProgress", Session.get("inProgress") - 1);
+        });
 	}
 	else{
-		Meteor.call("warriorSetComposition", gameId, Meteor.userId() , label, newComp);
+        Session.set("inProgress", Session.get("inProgress") + 1);
+		Meteor.call("warriorSetComposition", gameId, Meteor.userId() , label, newComp, function (error, result) {
+            Session.set("inProgress", Session.get("inProgress") - 1);
+        });
 	}
 }

@@ -9,9 +9,18 @@
     {{else}}
         <a class="create" href="#">Create</a>
     {{/if}}
+	<br/>
+	<label>Not started games:</label>
     <ul>
-        {{#each games}}
+        {{#each notStaredGames}}
         <li><a href="./games/{{_id}}">{{name}} ( players : {{players.length}} )</a></li>
+        {{/each}}
+    </ul>
+	<br/>
+	<label>games in progress:</label>
+	<ul>
+        {{#each myGames}}
+		<li><a href="./games/{{_id}}">{{name}} ( players : {{players.length}} )</a></li>
         {{/each}}
     </ul>
 </template>

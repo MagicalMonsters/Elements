@@ -1,5 +1,5 @@
 Template.games.helpers({
-    games: function () {
+    notStaredGames: function () {
         return Games.find({
             $and: [
                 {$or: [
@@ -11,6 +11,18 @@ Template.games.helpers({
             ]
         });
     },
+	myGames: function () {
+		return Games.find({
+			$and: [
+                {players: {
+					$elemMatch: {
+						userId: Meteor.userId()
+					}
+				}}, 
+                {turn: { $gt: -1 }}
+            ]
+		});
+	},
     isCreatingGame: function () {
         return Session.get("isCreatingGame");
     }

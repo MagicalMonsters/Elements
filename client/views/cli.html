@@ -1,7 +1,7 @@
 <template name="cli">
     <form id="cli_form">
         <input name="command" type="text">
-        <button type="submit">GO</button>
+        <button type="submit" {{isMyTurn}}>GO</button>
     </form>
     <span id="cli_log" style="color:{{color}};">
         {{log}}

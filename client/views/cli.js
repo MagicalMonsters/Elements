@@ -1,10 +1,12 @@
 Template.cli.helpers({
     isMyTurn: function () {
+		// return "disabled";
         var gameId = this.gameId;
         var game = Games.findOne({_id: gameId});
         var myIndex = _.findIndex(game.players, function (player){
             return player.userId == Meteor.userId();
         });
+        console.log("myIndex:" + myIndex);
         return (myIndex == game.turn) ? "enabled" : "disabled";
     },
     log: function () {

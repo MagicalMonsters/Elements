@@ -17,7 +17,7 @@ Meteor.methods({
                         composition: elems,
                         backpack: [0,0,0,0],
                         turnsToReincarnation: 6,
-                        moves: 0,
+                        moves: 1,
                         label: l[i],
 						canSplit: false,
                         });
@@ -59,7 +59,8 @@ Meteor.methods({
         });
 	},
 	
-	'warriorSetComposition': function (gameId , userId , warriorLabel, composition , resetReincarnation = false , newBackpack = []){
+	'warriorSetComposition': function (gameId , userId, warriorLabel, composition,
+									   resetReincarnation = false , newBackpack = []){
 		var game  = Games.findOne({_id: gameId});
 		var warriors = _.find(game.players, function(player){return player.userId == userId;}).warriors;
         

@@ -3,7 +3,8 @@
         <h3>Your warriors</h3>
         <ul>
             {{#each warriors}}
-            <li style="color:{{color}};">{{label}}&nbsp; comp: {{composition}} &nbsp; back:{{backpack}}</li>
+            <li class="{{#if canNotMove}} canNotMove {{else}} {{/if}}" style="color:{{color}};">
+                {{label}}&nbsp; comp: {{composition}} &nbsp; back:{{backpack}} &nbsp; rein:{{turnsToReincarnation}}</li>
             {{/each}}
         </ul>
     </div>

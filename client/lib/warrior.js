@@ -17,32 +17,32 @@ Warrior.type = function(composition){
 	return index;
 }
 
-Warrior.color = function(composition){
+Warrior.color = function(warrior){
     var colors = ['black', 'brown', 'blue', 'red', 'green'];
-    var res = Warrior.type(composition);
+    var res = Warrior.type(warrior.composition);
     res++;
     return colors[res];
 }
 
-Warrior.getWarrior = function(gameId , userid , label){
+Warrior.getWarrior = function(gameId, userId, label){
 
-	var game = Games.findOne({_id: gameId});
-    var playerWarriors = _.find(game.players, function (player) {
-        return player.userId == userid;
-    }).warriors;
+	var playerWarriors = Warrior.getWarriors(gameId, userId);
 
-    // get the warrior with the specified label
     return _.find(playerWarriors, function (warrior) {
         return warrior.label == label;
     });
-
 }
 
-Warrior.getWarriors = function(gameId, userid){
-	var game = Games.findOne({_id: gameId});
-    return _.find(game.players, function (player) {
-        return player.userId == userid;
+Warrior.canMove = function (warrior) {
+    return warrior.moves < 1;
+}
+
+Warrior.getWarriors = function(gameId, userId){
+    var game = Games.findOne({_id: gameId});
+    var playerWarriors = _.find(game.players, function (player) {
+        return player.userId == userId;
     }).warriors;
+    return playerWarriors;
 }
 
 Warrior.getOwner = function(gameId , position){

@@ -7,7 +7,9 @@ Template.info.helpers({
                 label: warrior.label,
                 composition: warrior.composition.join(','),
                 backpack: warrior.backpack.join(','),
-                color: Warrior.color(warrior.composition),
+                color: Warrior.color(warrior),
+                canNotMove: !Warrior.canMove(warrior),
+                turnsToReincarnation: warrior.turnsToReincarnation,
             };
         });
 

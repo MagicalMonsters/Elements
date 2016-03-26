@@ -58,7 +58,9 @@ function parse(gameId, command) {
         return add(gameId, tokens[1], tokens[2]);    
     } else if (action == "split") {
 		return spliting(gameId, tokens[1], tokens[2], tokens[3]);
-    } else if (action == "end") {
+    } else if (action == "merge") {
+		return merging(gameId, tokens[1], tokens[2]);
+    }else if (action == "end") {
         Session.set("inProgress", Session.get("inProgress") + 1);
         Meteor.call("endTurn", gameId , Meteor.userId(), function (error, result) {
             Session.set("inProgress", Session.get("inProgress") - 1);
@@ -310,4 +312,46 @@ function spliting(gameId, label, elements, direction){
             Session.set("inProgress", Session.get("inProgress") - 1);
         });
 	}
+}
+
+function merging(gameId, label, direction){
+	var game = Games.findOne({_id: gameId});
+	
+	var warrior = Warrior.getWarrior(gameId, Meteor.userId(), label);
+
+    if (warrior == undefined) {
+        return "No warrior with this label";
+    }
+	
+	if( !warrior.canSplit ) {
+		return "you can't merge yet";
+	}
+	
+	var comp = warrior.composition;
+    
+	var cellToMove = Board.directionOfCell(game, warrior.position, direction);
+	
+	if( cellToMove < -50 ) {
+		return "Invalid direction";
+	}
+	
+	var cellType = Board.cellType(game, cellToMove);
+	
+	if(cellType.type != "warrior"){
+		return "There is no warrior at that direction";
+	}
+	else if(Warrior.getOwner(gameId, cellType.warrior.position) != Meteor.userId() ){
+		return "You can only merge with your own warriors";
+	}
+	
+	newComp = _.map(cellType.warrior.composition , function (num, index){ return num + comp[index]} );
+	
+	Session.set("inProgress", Session.get("inProgress") + 1);
+	Meteor.call("warriorSetComposition", gameId, Meteor.userId() , cellType.warrior.label, newComp, function (error, result) {
+        Session.set("inProgress", Session.get("inProgress") - 1);
+    });
+	Session.set("inProgress", Session.get("inProgress") + 1);
+	Meteor.call("deleteWarrior", gameId, Meteor.userId(), warrior.label, function (error, result) {
+        Session.set("inProgress", Session.get("inProgress") - 1);
+    });
 }

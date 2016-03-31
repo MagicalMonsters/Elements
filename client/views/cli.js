@@ -12,30 +12,32 @@ Template.cli.helpers({
 
 Template.cli.events({
     'submit form#cli_form': function (e, tpl) {
-        e.preventDefault();
         var command = tpl.$('input[name=command]').val();
-        var log = parse(this.gameId, command);
-        Session.set("log", log);
+        submit(this.gameId, command, e);
     },
 
     'submit form#end_turn': function (e, tpl) {
-        e.preventDefault();
-        var log = parse(this.gameId, "end");
-        Session.set("log", log);
+        submit(this.gameId, "end", e);
     }
 });
 
-function parse(gameId, command) {
-
+function submit(gameId, command, e) {
+    e.preventDefault();
     var inProgress = Session.get("inProgress");
     if (inProgress == undefined) {
         Session.set("inProgress", 0);
     }
-
     if (inProgress != 0) {
         return;
     }
+    var log = parse(gameId, command);
+    Session.set("log", log);
+}
 
+function parse(gameId, command) {
+    if(!Logic.isMyTurn(gameId, Meteor.userId())){
+        return "This is not your turn";
+    }
     if (_.isEmpty(command)) {
         return "";
     }
@@ -44,11 +46,6 @@ function parse(gameId, command) {
         return "";
     }
     var action = tokens[0].toLowerCase();
-	
-	if(!Logic.isMyTurn(gameId, Meteor.userId())){
-		return "This is not your turn";
-	}
-
 	
     if (action == "create") {
         return create(gameId, tokens[1], tokens[2]);
@@ -73,8 +70,6 @@ function parse(gameId, command) {
 
 function create(gameId, elements, coordination) {
 
-	var game = Games.findOne({_id: gameId});
-
     var elems = elements.split(",");
     elems = _(elems).map(function (elem) {
         return parseInt(elem);
@@ -82,23 +77,27 @@ function create(gameId, elements, coordination) {
     var sum = _(elems).reduce(function (memo, num) {
         return memo + num;
     }, 0);
-	
-	var warriors = _.find(game.players, function(player){return player.userId == Meteor.userId();}).warriors;
+
+	var warriors = Warrior.getWarriors(gameId, Meteor.userId());
 	
 	if(warriors.length > 0){
 		return "You can't create more than one warrior";
 	}
 	
-    if (sum != 2000) {
-        return "The sum should be 2000";
+    if (sum != 20) {
+        return "The sum should be 20";
     }
-	
-	if(game.turn >= game.players.length){
+    
+    
+	if(!Logic.isFirstRound(gameId)){
 		return "You can create only at first turn";
 	}
-	
+
+    // TODO: should remove this 
+    var game = Games.findOne({_id: gameId});
+
     coordination = coordination.split(",");
-    var boardCellIndex = parseInt(coordination[1]) + parseInt(coordination[0])*game.boardSize;
+    var boardCellIndex = parseInt(coordination[1]) + parseInt(coordination[0]) * game.boardSize;
 	
 	if( Board.cellType(game, boardCellIndex).type != "empty" ) {
 		return "Not a valid position";

@@ -14,7 +14,15 @@ Board.cellType = function ( game , position ){
 	}
 	
     return { "type": "empty"};
-}
+};
+
+Board.cellColor = function (type) {
+    if (type == undefined || type < 0 || type > 4) {
+        return undefined;
+    }
+    var cellColors = ["Black", "LightBlue", "SaddleBrown", "DarkRed", "DarkBlue"];
+    return cellColors[type];
+};
 
 Board.directionOfCell = function ( game , position , direction){
 
@@ -31,4 +39,25 @@ Board.directionOfCell = function ( game , position , direction){
 
     return newPosition;
 	
-}
+};
+
+Board.findIdOfOwnerOfWarrior = function (gameId, position) {
+    var game = Games.findOne({_id: gameId});
+    for (var i = 0; i < game.players.length; i++) {
+        var Id = game.players[i].userId;
+        if (!(_.isUndefined(_.find(game.players[i].warriors, function (warrior) {
+                return warrior.position == position;
+            })))) {
+            return Id;
+        }
+    }
+};
+
+Board.playerColor = function (index) {
+    if (index == undefined || index < 0 || index > 4) {
+        return undefined;
+    }
+
+    var playerColors = ["SpringGreen", "Chartreuse", "DarkKhaki", "DarkSlateGray"];
+    return playerColors[index];
+};

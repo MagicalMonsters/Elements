@@ -3,12 +3,14 @@
 		{{#each board}}
 			<tr>
 			{{#each row}}
-				<td  class ="cell" style="background-color: {{color}}">
+				<td  class ="cell" style="background-color:{{color}}">
+                    {{#if hasWarrior}}
 					<svg class="warrior">
-						<circle class="player {{playerClass}}" />
-						<circle class="warrior {{warriorClass}}" />
+						<circle cx="30" cy="30" r="26" stroke="black" stroke-width="2" fill="{{playerColor}}"/>
+						<circle cx="30" cy="30" r="15" fill="{{warriorColor}}" />
 						<text x="25" y="35" fill="black">{{label}}</text>
 					</svg>
+                    {{/if}}
 				</td>
 			{{/each}}
 			</tr>

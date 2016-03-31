@@ -70,15 +70,10 @@ function parse(gameId, command) {
 
 function create(gameId, elements, coordination) {
 
-    var elems = elements.split(",");
-    elems = _(elems).map(function (elem) {
-        return parseInt(elem);
-    });
-    var sum = _(elems).reduce(function (memo, num) {
-        return memo + num;
-    }, 0);
+    var elems = Element.elementsFromString(elements);
+    var sum = Element.sumOfElements(elems);
 
-    var warriors = Warrior.getWarriors(gameId, Meteor.userId());
+    var warriors = Warrior.fetchWarriors(gameId, Meteor.userId());
 
     if (warriors.length > 0) {
         return "You can't create more than one warrior";
@@ -103,7 +98,7 @@ function create(gameId, elements, coordination) {
         return "Not a valid position";
     }
     Session.set("inProgress", Session.get("inProgress") + 1);
-    Meteor.call("createWarrior", gameId, Meteor.userId(), boardCellIndex, elems, function (error, result) {
+    Meteor.call("createWarrior", gameId, boardCellIndex, elems, function (error, result) {
         Session.set("inProgress", Session.get("inProgress") - 1);
     });
 }
@@ -116,7 +111,7 @@ function move(gameId, label, direction) {
         return "You can't move at first turn";
     }
 
-    var warrior = Warrior.getWarrior(gameId, label);
+    var warrior = Warrior.fetchOwnWarrior(gameId, label);
 
     if (warrior == undefined) {
         return "No warrior with this label.";
@@ -144,14 +139,14 @@ function move(gameId, label, direction) {
             Session.set("inProgress", Session.get("inProgress") - 1);
         });
         Session.set("inProgress", Session.get("inProgress") + 1);
-        Meteor.call("warriorSetPosition", gameId, Meteor.userId(), warrior.label, cellToMove, function (error, result) {
+        Meteor.call("warriorSetPosition", gameId, warrior.label, cellToMove, function (error, result) {
             Session.set("inProgress", Session.get("inProgress") - 1);
         });
     }
     else {
 
         otherWarrior = cellType.warrior;
-        if (!(_.isUndefined(_.find(Warrior.getWarriors(gameId, Meteor.userId()), function (warrior) {
+        if (!(_.isUndefined(_.find(Warrior.fetchWarriors(gameId, Meteor.userId()), function (warrior) {
                 return warrior.position == otherWarrior.position;
             })))) {
             return "Cannot move to that direction. (your warrior)";
@@ -170,7 +165,7 @@ function attack(gameId, warrior1, warrior2) {
 
     var result = Logic.calculateAttack(warrior1.composition, warrior2.composition);
 
-    var otherId = Warrior.getOwner(gameId, warrior2.position);
+    var otherId = Board.findIdOfOwnerOfWarrior(gameId, warrior2.position);
 
     if (_.reduce(result.composition2, function (memo, num) {
             return memo + num;
@@ -234,11 +229,8 @@ function canMove(warrior) {
 
 function add(gameId, label, elements) {
     var game = Games.findOne({_id: gameId});
-    var elems = elements.split(",");
-    elems = _(elems).map(function (elem) {
-        return parseInt(elem);
-    });
-    var warrior = Warrior.getWarrior(gameId, label);
+    var elems = Element.elementsFromString(elements);
+    var warrior = Warrior.fetchOwnWarrior(gameId, label);
     if (warrior == undefined) {
         return "No warrior with this label.";
     }
@@ -264,12 +256,9 @@ function add(gameId, label, elements) {
 function spliting(gameId, label, elements, direction) {
     var game = Games.findOne({_id: gameId});
 
-    var elems = elements.split(",");
-    elems = _(elems).map(function (elem) {
-        return parseInt(elem);
-    });
+    var elems = Element.elementsFromString(elements);
 
-    var warrior = Warrior.getWarrior(gameId, label);
+    var warrior = Warrior.fetchOwnWarrior(gameId, label);
 
     if (warrior == undefined) {
         return "No warrior with this label";
@@ -304,7 +293,7 @@ function spliting(gameId, label, elements, direction) {
             return memo + num;
         }, 0) != 0) {
         Session.set("inProgress", Session.get("inProgress") + 1);
-        Meteor.call("createWarrior", gameId, Meteor.userId(), cellToMove, elems, function (error, result) {
+        Meteor.call("createWarrior", gameId, cellToMove, elems, function (error, result) {
             Session.set("inProgress", Session.get("inProgress") - 1);
         });
     }
@@ -328,7 +317,7 @@ function spliting(gameId, label, elements, direction) {
 function merging(gameId, label, direction) {
     var game = Games.findOne({_id: gameId});
 
-    var warrior = Warrior.getWarrior(gameId, label);
+    var warrior = Warrior.fetchOwnWarrior(gameId, label);
 
     if (warrior == undefined) {
         return "No warrior with this label";
@@ -351,7 +340,7 @@ function merging(gameId, label, direction) {
     if (cellType.type != "warrior") {
         return "There is no warrior at that direction";
     }
-    else if (Warrior.getOwner(gameId, cellType.warrior.position) != Meteor.userId()) {
+    else if (Board.findIdOfOwnerOfWarrior(gameId, cellType.warrior.position) != Meteor.userId()) {
         return "You can only merge with your own warriors";
     }
 

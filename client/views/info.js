@@ -1,6 +1,6 @@
 Template.info.helpers({
     warriors: function () {
-        var warriors = Warrior.getWarriors(this.gameId, Meteor.userId());
+        var warriors = Warrior.fetchWarriors(this.gameId, Meteor.userId());
         return _.map(warriors, function(warrior) {
             return {
                 label: warrior.label,

@@ -9,70 +9,10 @@ td.cell {
 	vertical-align: middle; 
 	width: 60px; 
 	height: 60px;
+	border-width:0;
 }
 
 svg.warrior {
 	width: 60px;
 	height: 60px;
-}
-
-circle.warrior {
-	cx: 30;
-	cy: 30;
-}
-
-circle.warrior-1 {
-	r: 0;
-}
-
-circle.warrior0 {
-	r : 15;
-	fill: brown;
-}
-
-circle.warrior1 {
-	r : 15;
-	fill: blue;
-}
-
-circle.warrior2 {
-	r : 15;
-	fill: red;
-}
-
-circle.warrior3 {
-	r : 15;
-	fill: green;
-}
-
-circle.player {
-	cx: 30;
-	cy: 30;
-	stroke: black;
-	stroke-width: 2;
-}
-
-circle.player-1 {
-	r : 0;
-	stroke-width: 0;
-}
-
-circle.player0 {
-	r : 26;
-	fill: purple;
-}
-
-circle.player1 {
-	r : 26;
-	fill: white;
-}
-
-circle.player2 {
-	r : 26;
-	fill: orange;
-}
-
-circle.player3 {
-	r : 26;
-	fill: yellow;
 }

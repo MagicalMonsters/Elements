@@ -1,19 +1,23 @@
 Board = {};
 
-Board.cellType = function ( game , position ){
+Board.cellType = function (gameId, position) {
+    var game = Games.findOne({_id: gameId});
+    if (position < 0 || position >= game.boardSize * game.boardSize || game.board[position] == 0) {
+        return {"type": "wall"};
+    }
 
-	if( position < 0 || position >= game.boardSize*game.boardSize || game.board[position] == 0) {
-        return { "type": "wall"};
-    } 
-	
-	var warriors = _.flatten(_.map(game.players, function (player) { return player.warriors }));
-	var warrior = _.find(warriors, function(warrior){ return warrior.position == position } );
-	
-	if( !(_.isUndefined(warrior))){
-		return { "type": "warrior" , "warrior": warrior };
-	}
-	
-    return { "type": "empty"};
+    var warriors = _.flatten(_.map(game.players, function (player) {
+        return player.warriors
+    }));
+    var warrior = _.find(warriors, function (warrior) {
+        return warrior.position == position
+    });
+
+    if (!(_.isUndefined(warrior))) {
+        return {"type": "warrior", "warrior": warrior};
+    }
+
+    return {"type": "empty"};
 };
 
 Board.cellColor = function (type) {
@@ -24,22 +28,23 @@ Board.cellColor = function (type) {
     return cellColors[type];
 };
 
-Board.directionOfCell = function ( game , position , direction){
-
-	var directions = [[0,-1], [0,1], [-1,0], [1,0]];
+Board.directionOfCell = function (gameId, position, direction) {
+    var game = Games.findOne({_id: gameId});
+    var directions = [[0, -1], [0, 1], [-1, 0], [1, 0]];
     var directionLetters = ['l', 'r', 'u', 'd'];
-	
+
     var indexOf = _.indexOf(directionLetters, direction);
-	
-	if (indexOf == -1) {
-		return  -100;
+
+    if (indexOf == -1) {
+        return -100;
     }
-	
-	var newPosition = position + (directions[indexOf][0] * game.boardSize) + directions[indexOf][1];
+
+    var newPosition = position + (directions[indexOf][0] * game.boardSize) + directions[indexOf][1];
 
     return newPosition;
-	
+
 };
+
 
 Board.findIdOfOwnerOfWarrior = function (gameId, position) {
     var game = Games.findOne({_id: gameId});
@@ -61,3 +66,11 @@ Board.playerColor = function (index) {
     var playerColors = ["SpringGreen", "Chartreuse", "DarkKhaki", "DarkSlateGray"];
     return playerColors[index];
 };
+
+Board.coordinationStringToPosition = function (gameId, coordinationString) {
+    var game = Games.findOne({_id: gameId});
+
+    var coordination = coordinationString.split(",");
+    var boardCellIndex = parseInt(coordination[1]) + parseInt(coordination[0]) * game.boardSize;
+    return boardCellIndex;
+}

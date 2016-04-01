@@ -1,19 +1,19 @@
 <template name="game">
-	{{#if isStarted}}
+    {{#if isStarted}}
         {{>info game}}
-		{{>board game}}
-	{{/if}}
+        {{>board game}}
+    {{/if}}
     <a href="/">back</a>
     <h3>hello</h3>
     <h3>{{name}}</h3>
-	{{#if canJoin}}
-		<a id="join-btn" href="#">join</a>
-	{{/if}}
-	<a id="leave-btn" href="#">leave</a>
+    {{#if canJoin}}
+        <a id="join-btn" href="#">join</a>
+    {{/if}}
+    <a id="leave-btn" href="#">leave</a>
     {{#if canStart}}
         <a id="start-btn" href="#">start</a>
     {{/if}}
-	{{#if isStarted}}
-		{{>cli game}}
-	{{/if}}
+    {{#if isStarted}}
+        {{>cli game}}
+    {{/if}}
 </template>

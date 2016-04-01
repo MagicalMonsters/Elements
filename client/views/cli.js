@@ -3,10 +3,10 @@ Template.cli.helpers({
         return (Logic.isMyTurn(this.gameId, Meteor.userId())) ? "enabled" : "disabled";
     },
     log: function () {
-        return Session.get("log") ? Session.get("log") : "Success";
+        return Session.get("log");
     },
     color: function () {
-        return Session.get("log") ? "red" : "green";
+        return Session.get("log") == "success" ? "green" : "red";
     }
 });
 
@@ -30,75 +30,14 @@ function submit(gameId, command, e) {
     if (inProgress != 0) {
         return;
     }
-    var log = parse(gameId, command);
-    Session.set("log", log);
-}
 
-function parse(gameId, command) {
-    if (!Logic.isMyTurn(gameId, Meteor.userId())) {
-        return "This is not your turn";
-    }
-    if (_.isEmpty(command)) {
-        return "";
-    }
-    var tokens = command.split(" ");
-    if (_.isEmpty(tokens)) {
-        return "";
-    }
-    var action = tokens[0].toLowerCase();
-
-    if (action == "create") {
-        return create(gameId, tokens[1], tokens[2]);
-    } else if (action == "move") {
-        return move(gameId, tokens[1], tokens[2]);
-    } else if (action == "add") {
-        return add(gameId, tokens[1], tokens[2]);
-    } else if (action == "split") {
-        return spliting(gameId, tokens[1], tokens[2], tokens[3]);
-    } else if (action == "merge") {
-        return merging(gameId, tokens[1], tokens[2]);
-    } else if (action == "end") {
-        Session.set("inProgress", Session.get("inProgress") + 1);
-        Meteor.call("endTurn", gameId, Meteor.userId(), function (error, result) {
-            Session.set("inProgress", Session.get("inProgress") - 1);
-        });
-    } else {
-        return "unknown command!";
-    }
-}
-
-
-function create(gameId, elements, coordination) {
-
-    var elems = Element.elementsFromString(elements);
-    var sum = Element.sumOfElements(elems);
-
-    var warriors = Warrior.fetchWarriors(gameId, Meteor.userId());
-
-    if (warriors.length > 0) {
-        return "You can't create more than one warrior";
-    }
-
-    if (sum != 20) {
-        return "The sum should be 20";
-    }
-
-
-    if (!Logic.isFirstRound(gameId)) {
-        return "You can create only at first turn";
-    }
-
-    // TODO: should remove this
-    var game = Games.findOne({_id: gameId});
-
-    coordination = coordination.split(",");
-    var boardCellIndex = parseInt(coordination[1]) + parseInt(coordination[0]) * game.boardSize;
-
-    if (Board.cellType(game, boardCellIndex).type != "empty") {
-        return "Not a valid position";
-    }
+    Session.set("log", "");
     Session.set("inProgress", Session.get("inProgress") + 1);
-    Meteor.call("createWarrior", gameId, boardCellIndex, elems, function (error, result) {
+    Command.parse(gameId, command, function (error) {
+        if (!error) {
+            error = "success";
+        }
+        Session.set("log", error);
         Session.set("inProgress", Session.get("inProgress") - 1);
     });
 }
@@ -121,13 +60,13 @@ function move(gameId, label, direction) {
         return "You can't move any more in this turn";
     }
 
-    var cellToMove = Board.directionOfCell(game, warrior.position, direction);
+    var cellToMove = Board.directionOfCell(gameId, warrior.position, direction);
 
     if (cellToMove < -50) {
         return "Invalid direction";
     }
 
-    var cellType = Board.cellType(game, cellToMove);
+    var cellType = Board.cellType(gameId, cellToMove);
 
     if (cellType.type == "wall") {
         return "Cannot move to that direction. (wall)";
@@ -277,13 +216,13 @@ function spliting(gameId, label, elements, direction) {
         newComp[i] -= elems[i];
     }
 
-    var cellToMove = Board.directionOfCell(game, warrior.position, direction);
+    var cellToMove = Board.directionOfCell(gameId, warrior.position, direction);
 
     if (cellToMove < -50) {
         return "Invalid direction";
     }
 
-    var cellType = Board.cellType(game, cellToMove);
+    var cellType = Board.cellType(gameId, cellToMove);
 
     if (cellType.type != "empty") {
         return "You can't move to that direction";
@@ -329,13 +268,13 @@ function merging(gameId, label, direction) {
 
     var comp = warrior.composition;
 
-    var cellToMove = Board.directionOfCell(game, warrior.position, direction);
+    var cellToMove = Board.directionOfCell(gameId, warrior.position, direction);
 
     if (cellToMove < -50) {
         return "Invalid direction";
     }
 
-    var cellType = Board.cellType(game, cellToMove);
+    var cellType = Board.cellType(gameId, cellToMove);
 
     if (cellType.type != "warrior") {
         return "There is no warrior at that direction";

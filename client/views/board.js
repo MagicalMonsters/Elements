@@ -1,5 +1,4 @@
 Template.board.helpers({
-
     board: function () {
         var gameID = this.gameId;
         var data = Games.findOne({_id: gameID});
@@ -39,5 +38,4 @@ Template.board.helpers({
 
         return board;
     }
-
 });

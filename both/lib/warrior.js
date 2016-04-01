@@ -5,17 +5,15 @@ Warrior.createOne = function (position, elems, label) {
         position: position,
         composition: elems,
         backpack: [0, 0, 0, 0],
-        // turnsToReincarnation: 6,
         moves: 1,
         label: label,
-        // canSplit: false,
     };
 };
 
-Warrior.air = function (warrior) {getElem(warrior, 0)};
-Warrior.earth = function (warrior) {getElem(warrior, 1)};
-Warrior.fire = function (warrior) {getElem(warrior, 2)};
-Warrior.water = function (warrior) {getElem(warrior, 3)};
+Warrior.air = function (warrior) {return getElem(warrior, 0)};
+Warrior.earth = function (warrior) {return getElem(warrior, 1)};
+Warrior.fire = function (warrior) {return getElem(warrior, 2)};
+Warrior.water = function (warrior) {return getElem(warrior, 3)};
 
 function getElem(warrior, type) {
     return warrior.elems[type];

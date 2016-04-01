@@ -1,5 +1,5 @@
 Meteor.methods({
-    'createWarrior': function (gameId, position, elems) {
+    'warriorCreate': function (gameId, position, elems) {
         var warriors = Warrior.fetchWarriors(gameId, Meteor.userId());
         var l = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         for (var i = 0; i < l.length; i++) {
@@ -17,75 +17,32 @@ Meteor.methods({
         });
     },
 
-    'warriorSetPosition': function (gameId, warriorLabel, position) {
-        var warriors = Warrior.fetchWarriors(gameId, Meteor.userId());
-        for (var i = 0; i < warriors.length; i++) {
-            if (warriors[i].label == warriorLabel) {
-                warriors[i].position = position;
-                break;
-            }
-        }
-
-        Games.update({_id: gameId, "players.userId": Meteor.userId()}, {
-            $set: {"players.$.warriors": warriors}
-        });
-    },
-
-    'warriorActs': function (gameId, userId, warriorLabel) {
+    'warriorUpdate': function (gameId, userId, warrior) {
         var warriors = Warrior.fetchWarriors(gameId, userId);
 
-        for (var i = 0; i < warriors.length; i++) {
-            if (warriors[i].label == warriorLabel) {
-                warriors[i].moves++;
-                break;
-            }
-        }
-
-        Games.update({_id: gameId, "players.userId": userId}, {
-            $set: {"players.$.warriors": warriors}
-        });
-    },
-
-    'warriorSetComposition': function (gameId, userId, warriorLabel, composition,
-                                       resetReincarnation = false, newBackpack = []) {
-        var warriors = Warrior.fetchWarriors(gameId, userId);
-
-        for (var i = 0; i < warriors.length; i++) {
-            if (warriors[i].label == warriorLabel) {
-                warriors[i].composition = composition;
-                if (newBackpack.length == 4) {
-                    warriors[i].backpack = newBackpack;
+        // check and delete if the composition is totally empty otherwise update
+        if (warrior.composition[0] + warrior.composition[1] + warrior.composition[2] + warrior.composition[3] == 0) {
+            var warriorIndex;
+            for (var i = 0; i < warriors.length; i++) {
+                if (warriors[i].label == warrior.label) {
+                    warriorIndex = i;
                 }
-                if (resetReincarnation) {
-                    warriors[i].turnsToReincarnation = 6;
-                    warriors[i].canSplit = true;
+            }
+            warriors.splice(warriorIndex, 1);
+        } else {
+            for (var i = 0; i < warriors.length; i++) {
+                if (warriors[i].label == warrior.label) {
+                    warriors[i] = warrior;
+                    break;
                 }
-                break;
             }
         }
-
         Games.update({_id: gameId, "players.userId": userId}, {
             $set: {"players.$.warriors": warriors}
         });
     },
 
-    'deleteWarrior': function (gameId, userId, warriorLabel) {
-
-        var warriors = Warrior.fetchWarriors(gameId, userId);
-        var warriorIndex;
-        for (var i = 0; i < warriors.length; i++) {
-            if (warriors[i].label == warriorLabel) {
-                warriorIndex = i;
-            }
-        }
-        warriors.splice(warriorIndex, 1);
-        Games.update({_id: gameId, "players.userId": userId}, {
-            $set: {"players.$.warriors": warriors}
-        });
-    },
-
-    'endTurn': function (gameId, userId) {
-
+    'warriorEnd': function (gameId, userId) {
         var warriors = Warrior.fetchWarriors(gameId, userId);
 
         // TODO: should get rid of this

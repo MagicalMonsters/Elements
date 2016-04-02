@@ -40,7 +40,7 @@ Warrior.color = function (warrior) {
     if (!warrior) {
         return undefined;
     }
-    var colors = ['Grey', 'LightSkyBlue', 'Peru', 'Red', 'DodgerBlue'];
+    var colors = ['Grey', 'LightSkyBlue', 'Peru', 'Red', 'RoyalBlue'];
     var res = Warrior.type(warrior.composition);
     res++;
     return colors[res];

@@ -24,7 +24,7 @@ Board.cellColor = function (type) {
     if (type == undefined || type < 0 || type > 4) {
         return undefined;
     }
-    var cellColors = ["Black", "LightBlue", "SaddleBrown", "DarkRed", "DarkBlue"];
+    var cellColors = ['Black', 'LightSkyBlue', 'Peru', 'Red', 'RoyalBlue'];
     return cellColors[type];
 };
 

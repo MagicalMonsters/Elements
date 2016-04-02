@@ -64,8 +64,8 @@ Template.game.events({
 		Games.update({_id : this.gameId}, {
 			$set: {
 				turn: 0,
-				boardSize: 7, 
-				board: createBoard(7)
+				boardSize: 8,
+				board: createBoard(8)
 			}
 		});
 	}

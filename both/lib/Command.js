@@ -81,16 +81,11 @@ Command.move = function (gameId, label, direction, callback) {
         warrior.position = cellToMove;
     }
 
-    var lock = 1;
     Meteor.call("warriorUpdate", gameId, Meteor.userId(), warrior, function (error, result) {
         if (opponentWarrior) {
-            lock++;
             var ownerId = Board.findIdOfOwnerOfWarrior(gameId, cellToMove);
             Meteor.call("warriorUpdate", gameId, ownerId, opponentWarrior, function (error, result) {
-                lock--;
-                if (lock == 0) {
                     callback();
-                }
             });
         } else {
             callback();

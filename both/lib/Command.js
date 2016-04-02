@@ -76,7 +76,7 @@ Command.move = function (gameId, label, direction, callback) {
         opponentWarrior = Logic.calculateAndApplyAttack(gameId, warrior, cellToMove);
     }
 
-    if (!opponentWarrior || Element.sumOfElements(opponentWarrior) == 0) {
+    if (!opponentWarrior || Element.sumOfElements(opponentWarrior.composition) == 0) {
         // we can move the warrior
         warrior.position = cellToMove;
     }

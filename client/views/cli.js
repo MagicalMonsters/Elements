@@ -21,22 +21,19 @@ Template.cli.events({
     }
 });
 
+var inProgress = false;
+
 function submit(gameId, command, e) {
     e.preventDefault();
-    var inProgress = Session.get("inProgress");
-    if (inProgress == undefined) {
-        Session.set("inProgress", 0);
-    }
     if (inProgress != 0) {
         return;
     }
     Session.set("log", "");
-    Session.set("inProgress", Session.get("inProgress") + 1);
     Command.parse(gameId, command, function (error) {
         if (!error) {
             error = "success";
         }
         Session.set("log", error);
-        Session.set("inProgress", Session.get("inProgress") - 1);
+        inProgress = false;
     });
 }

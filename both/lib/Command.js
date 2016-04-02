@@ -28,7 +28,7 @@ Command.parse = function(gameId, command, callback) {
     } else if (action == "split") {
         Command.split(gameId, tokens[1], tokens[2], tokens[3], callback);
     } else if (action == "merge") {
-        Command.merge(gameId, tokens[1], tokens[2], callback);
+        Command.merge(gameId, tokens[1], tokens[2], tokens[3], callback);
     } else if (action == "end") {
         Command.endTurn(gameId, callback);
     } else {
@@ -76,7 +76,7 @@ Command.move = function (gameId, label, direction, callback) {
         opponentWarrior = Logic.calculateAndApplyAttack(gameId, warrior, cellToMove);
     }
 
-    if (!opponentWarrior) {
+    if (!opponentWarrior || Element.sumOfElements(opponentWarrior) == 0) {
         // we can move the warrior
         warrior.position = cellToMove;
     }
@@ -141,11 +141,12 @@ Command.split = function (gameId, label, elements, direction, callback) {
     });
 };
 
-Command.merge = function (gameId, label, direction, callback) {
+Command.merge = function (gameId, label, elements, direction, callback) {
+    var elems = Element.elementsFromString(elements);
     var warrior = Warrior.fetchOwnWarrior(gameId, label);
     var cellToMove = Board.directionOfCell(gameId, warrior.position, direction);
 
-    var error = Logic.canMerge(gameId, warrior, cellToMove);
+    var error = Logic.canMerge(gameId, warrior, cellToMove, elems);
     if (error) {
         callback(error);
         return;
@@ -154,10 +155,13 @@ Command.merge = function (gameId, label, direction, callback) {
     // merge cost
     warrior.composition[3]--;
 
+    var shouldAddBackback = (Element.sumOfElements(warrior.composition) - Element.sumOfElements(elems) == 0);
     var destWarrior = Board.cellType(gameId, cellToMove).warrior;
     for (var i = 0; i < warrior.composition.length; i++) {
         destWarrior.composition[i] += warrior.composition[i];
-        destWarrior.backpack[i] += warrior.backpack[i];
+        if (shouldAddBackback) {
+            destWarrior.backpack[i] += warrior.backpack[i];
+        }
         warrior.composition[i] = 0;
     }
 

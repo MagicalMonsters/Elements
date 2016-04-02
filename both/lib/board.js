@@ -63,7 +63,7 @@ Board.playerColor = function (index) {
         return undefined;
     }
 
-    var playerColors = ["SpringGreen", "Chartreuse", "DarkKhaki", "DarkSlateGray"];
+    var playerColors = ["SpringGreen", "Fuchsia", "Gold", "Olive"];
     return playerColors[index];
 };
 

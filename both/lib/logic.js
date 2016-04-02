@@ -150,6 +150,10 @@ Logic.canSplit = function (gameId, warrior, cellToMove, elems) {
         return "You don't have enough water to do the split!";
     }
 
+    if (Element.sumOfElements(warrior.composition) - Element.sumOfElements(elems) < 2) {
+        return "You can not completely destroy one warrior in splitting!";
+    }
+
     for (var i = 0; i < warrior.composition.length; i++) {
         if (elems[i] > warrior.composition[i] || (i == 3 && elems[i] == warrior.composition[i])) {
             return "You don't have this much resource! \n remember to leave 1 water as the cost!";
@@ -163,12 +167,12 @@ Logic.canSplit = function (gameId, warrior, cellToMove, elems) {
     return undefined;
 };
 
-Logic.canMerge = function (gameId, warrior, cellToMove) {
+Logic.canMerge = function (gameId, warrior, cellToMove, elems) {
     if (Logic.isFirstRound(gameId)) {
         return "You can't merge at first turn!";
     }
 
-    if (warrior == undefined) {
+    if (!warrior) {
         return "No warrior with this label!";
     }
 
@@ -187,6 +191,12 @@ Logic.canMerge = function (gameId, warrior, cellToMove) {
         return "You can only merge with your own warrior!";
     }
 
+    for (var i = 0; i < warrior.composition.length; i++) {
+        if (elems[i] > warrior.composition[i] || (i == 3 && elems[i] == warrior.composition[i])) {
+            return "You don't have this much resource! \n remember to leave 1 water as the cost!";
+        }
+    }
+
     return undefined;
 }
 
@@ -195,7 +205,7 @@ Logic.canAdd = function (gameId, warrior, elems) {
         return "You can't add at first turn!";
     }
 
-    if (warrior == undefined) {
+    if (!warrior) {
         return "No warrior with this label!";
     }
 

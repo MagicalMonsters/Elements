@@ -133,6 +133,28 @@ Logic.isValidMove = function (gameId, warrior, cellToMove) {
     }
 };
 
+Logic.canAdd = function (gameId, warrior, elems) {
+    if (Logic.isFirstRound(gameId)) {
+        return "You can't add at first turn!";
+    }
+
+    if (warrior == undefined) {
+        return "No warrior with this label!";
+    }
+
+    if (Warrior.earth(warrior) == 0) {
+        return "You don't have enough earth to make the addition!";
+    }
+
+    for (var i = 0; i < warrior.backpack.length ; i++) {
+        if (elems[i] > warrior.backpack[i]) {
+            return "You don't have this much in your backpack!";
+        }
+    }
+
+    return undefined;
+};
+
 Logic.isMoveAttack = function (gameId, warrior, cellToMove) {
     var cellType = Board.cellType(gameId, cellToMove);
     if (cellType.type == "empty") {

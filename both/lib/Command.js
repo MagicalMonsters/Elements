@@ -101,6 +101,29 @@ Command.move = function (gameId, label, direction, callback) {
     }
 };
 
+Command.add = function (gameId, label, elements, callback) {
+    var elems = Element.elementsFromString(elements);
+    var warrior = Warrior.fetchOwnWarrior(gameId, label);
+
+    var error = Logic.canAdd(gameId, warrior, elems);
+    if (error) {
+        callback(error);
+        return;
+    }
+
+    // cost of add
+    warrior.composition[1]--;
+
+    for (var i = 0; i < warrior.composition.length; i++) {
+        warrior.composition[i] += elems[i];
+        warrior.backpack[i] -= elems[i];
+    }
+
+    Meteor.call("warriorUpdate", gameId, Meteor.userId(), warrior, function () {
+        callback();
+    });
+};
+
 Command.endTurn = function (gameId, callback) {
     Meteor.call("warriorEndTurn", gameId, function () {
         callback();

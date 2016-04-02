@@ -16,7 +16,7 @@ Warrior.fire = function (warrior) {return getElem(warrior, 2)};
 Warrior.water = function (warrior) {return getElem(warrior, 3)};
 
 function getElem(warrior, type) {
-    return warrior.elems[type];
+    return warrior.composition[type];
 }
 
 Warrior.type = function (composition) {

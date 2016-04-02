@@ -41,65 +41,6 @@ function submit(gameId, command, e) {
     });
 }
 
-function move(gameId, label, direction) {
-
-    var game = Games.findOne({_id: gameId});
-
-    if (Logic.isFirstRound(gameId)) {
-        return "You can't move at first turn";
-    }
-
-    var warrior = Warrior.fetchOwnWarrior(gameId, label);
-
-    if (warrior == undefined) {
-        return "No warrior with this label.";
-    }
-
-    if (!canMove(warrior)) {
-        return "You can't move any more in this turn";
-    }
-
-    var cellToMove = Board.directionOfCell(gameId, warrior.position, direction);
-
-    if (cellToMove < -50) {
-        return "Invalid direction";
-    }
-
-    var cellType = Board.cellType(gameId, cellToMove);
-
-    if (cellType.type == "wall") {
-        return "Cannot move to that direction. (wall)";
-    }
-
-    else if (cellType.type == "empty") {
-        Session.set("inProgress", Session.get("inProgress") + 1);
-        Meteor.call("warriorActs", gameId, Meteor.userId(), warrior.label, function (error, result) {
-            Session.set("inProgress", Session.get("inProgress") - 1);
-        });
-        Session.set("inProgress", Session.get("inProgress") + 1);
-        Meteor.call("warriorSetPosition", gameId, warrior.label, cellToMove, function (error, result) {
-            Session.set("inProgress", Session.get("inProgress") - 1);
-        });
-    }
-    else {
-
-        otherWarrior = cellType.warrior;
-        if (!(_.isUndefined(_.find(Warrior.fetchWarriors(gameId, Meteor.userId()), function (warrior) {
-                return warrior.position == otherWarrior.position;
-            })))) {
-            return "Cannot move to that direction. (your warrior)";
-        }
-        else {
-            Session.set("inProgress", Session.get("inProgress") + 1);
-            Meteor.call("warriorActs", gameId, Meteor.userId(), warrior.label, function (error, result) {
-                Session.set("inProgress", Session.get("inProgress") - 1);
-            });
-            return attack(gameId, warrior, otherWarrior);
-        }
-    }
-}
-
-
 function add(gameId, label, elements) {
     var game = Games.findOne({_id: gameId});
     var elems = Element.elementsFromString(elements);

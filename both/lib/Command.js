@@ -83,22 +83,19 @@ Command.move = function (gameId, label, direction, callback) {
 
     var lock = 1;
     Meteor.call("warriorUpdate", gameId, Meteor.userId(), warrior, function (error, result) {
-        lock--;
-        if (lock == 0) {
+        if (opponentWarrior) {
+            lock++;
+            var ownerId = Board.findIdOfOwnerOfWarrior(gameId, cellToMove);
+            Meteor.call("warriorUpdate", gameId, ownerId, opponentWarrior, function (error, result) {
+                lock--;
+                if (lock == 0) {
+                    callback();
+                }
+            });
+        } else {
             callback();
         }
     });
-
-    if (opponentWarrior) {
-        lock++;
-        var ownerId = Board.findIdOfOwnerOfWarrior(gameId, cellToMove);
-        Meteor.call("warriorUpdate", gameId, ownerId, opponentWarrior, function (error, result) {
-            lock--;
-            if (lock == 0) {
-                callback();
-            }
-        });
-    }
 };
 
 Command.add = function (gameId, label, elements, callback) {
@@ -124,9 +121,60 @@ Command.add = function (gameId, label, elements, callback) {
     });
 };
 
+Command.split = function (gameId, label, elements, direction, callback) {
+    var elems = Element.elementsFromString(elements);
+    var warrior = Warrior.fetchOwnWarrior(gameId, label);
+    var cellToMove = Board.directionOfCell(gameId, warrior.position, direction);
+    
+    var error = Logic.canSplit(gameId, warrior, cellToMove, elems);
+    if (error) {
+        callback(error);
+        return;
+    }
+
+    // water cost for split
+    warrior.composition[3]--;
+
+    for (var i = 0; i < warrior.composition.length; i++) {
+        warrior.composition[i] -= elems[i];
+    }
+
+    Meteor.call("warriorCreate", gameId, cellToMove, elems, function (error, result) {
+        Meteor.call("warriorUpdate", gameId, Meteor.userId(), warrior, function () {
+            callback();
+        });
+    });
+};
+
+Command.merge = function (gameId, label, direction, callback) {
+    var warrior = Warrior.fetchOwnWarrior(gameId, label);
+    var cellToMove = Board.directionOfCell(gameId, warrior.position, direction);
+
+    var error = Logic.canMerge(gameId, warrior, cellToMove);
+    if (error) {
+        callback(error);
+        return;
+    }
+
+    // merge cost
+    warrior.composition[3]--;
+
+    var destWarrior = Board.cellType(gameId, cellToMove).warrior;
+    for (var i = 0; i < warrior.composition.length; i++) {
+        destWarrior.composition[i] += warrior.composition[i];
+        destWarrior.backpack[i] += warrior.backpack[i];
+        warrior.composition[i] = 0;
+    }
+
+    Meteor.call("warriorUpdate", gameId, Meteor.userId(), warrior, function () {
+        Meteor.call("warriorUpdate", gameId, Meteor.userId(), destWarrior, function () {
+            callback();
+        });
+    });
+};
+
 Command.endTurn = function (gameId, callback) {
     Meteor.call("warriorEndTurn", gameId, function () {
         callback();
     });
 };
-

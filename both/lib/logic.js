@@ -2,32 +2,32 @@ Logic = {};
 
 Logic.calculateAndApplyAttack = function (gameId, warrior, cellToMove) {
     var opponentWarrior = Board.cellType(gameId, cellToMove).warrior;
-    
+
     var playerTotal = Element.sumOfElements(warrior.composition);
     var opponentTotal = Element.sumOfElements(opponentWarrior.composition);
 
     var delta = Math.abs(playerTotal - opponentTotal);
 
+    // assume that warrior is winner
+    var winnerWarrior = warrior;
+    var loserWarrior = opponentWarrior;
+
     if (playerTotal < opponentTotal) {
-        var temp = opponentWarrior;
-        opponentWarrior = warrior;
-        warrior = temp;
+        var temp = winnerWarrior;
+        winnerWarrior = loserWarrior;
+        loserWarrior = temp;
     }
 
-    opponentWarrior.composition = Logic.reduceComposition(opponentWarrior.composition, delta);
-    if (Warrior.isDead(opponentWarrior)) {
+    // all the calculation is based on winner and loser
+    loserWarrior.composition = Logic.reduceComposition(loserWarrior.composition, delta);
+    if (Warrior.isDead(loserWarrior)) {
         // should add the backpack
-        for (var i = 0; i < opponentWarrior.backpack.length; i++) {
-            warrior.backpack[i] += opponentWarrior.backpack[i];
+        for (var i = 0; i < loserWarrior.backpack.length; i++) {
+            winnerWarrior.backpack[i] += loserWarrior.backpack[i];
         }
     }
 
-    if (playerTotal < opponentTotal) {
-        var temp = opponentWarrior;
-        opponentWarrior = warrior;
-        warrior = temp;
-    }
-
+    // we should return the new composition of opponent regardless of the result
     return opponentWarrior;
 };
 
@@ -46,7 +46,7 @@ Logic.reduceComposition = function (composition, delta) {
         delta = -Math.min(composition[maxIndex], 0);
         composition[maxIndex] = Math.max(composition[maxIndex], 0);
     } while (delta > 0);
-    
+
     return composition;
 };
 
@@ -133,6 +133,63 @@ Logic.isValidMove = function (gameId, warrior, cellToMove) {
     }
 };
 
+Logic.canSplit = function (gameId, warrior, cellToMove, elems) {
+    if (Logic.isFirstRound(gameId)) {
+        return "You can't split at first turn!";
+    }
+
+    if (warrior == undefined) {
+        return "No warrior with this label!";
+    }
+
+    if (cellToMove < -50) {
+        return "Invalid direction!";
+    }
+
+    if (Warrior.water(warrior) == 0) {
+        return "You don't have enough water to do the split!";
+    }
+
+    for (var i = 0; i < warrior.composition.length; i++) {
+        if (elems[i] > warrior.composition[i] || (i == 3 && elems[i] == warrior.composition[i])) {
+            return "You don't have this much resource! \n remember to leave 1 water as the cost!";
+        }
+    }
+
+    var cellType = Board.cellType(gameId, cellToMove);
+    if (cellType.type != "empty") {
+        return "You can only split to an empty cell!";
+    }
+    return undefined;
+};
+
+Logic.canMerge = function (gameId, warrior, cellToMove) {
+    if (Logic.isFirstRound(gameId)) {
+        return "You can't merge at first turn!";
+    }
+
+    if (warrior == undefined) {
+        return "No warrior with this label!";
+    }
+
+    if (cellToMove < -50) {
+        return "Invalid direction!";
+    }
+
+    if (Warrior.water(warrior) == 0) {
+        return "You don't have enough water to do the merge!";
+    }
+
+    var cellType = Board.cellType(gameId, cellToMove);
+
+    if (cellType.type != "warrior" ||
+        Board.findIdOfOwnerOfWarrior(gameId, cellType.warrior.position) != Meteor.userId()) {
+        return "You can only merge with your own warrior!";
+    }
+
+    return undefined;
+}
+
 Logic.canAdd = function (gameId, warrior, elems) {
     if (Logic.isFirstRound(gameId)) {
         return "You can't add at first turn!";
@@ -146,7 +203,7 @@ Logic.canAdd = function (gameId, warrior, elems) {
         return "You don't have enough earth to make the addition!";
     }
 
-    for (var i = 0; i < warrior.backpack.length ; i++) {
+    for (var i = 0; i < warrior.backpack.length; i++) {
         if (elems[i] > warrior.backpack[i]) {
             return "You don't have this much in your backpack!";
         }

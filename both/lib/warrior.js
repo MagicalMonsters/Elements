@@ -74,3 +74,7 @@ Warrior.fetchWarriors = function (gameId, userId) {
     return playerWarriors;
 };
 
+Warrior.isDead = function (warrior) {
+    return Element.sumOfElements(warrior.composition) === 0;
+};
+

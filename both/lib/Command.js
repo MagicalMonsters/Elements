@@ -30,7 +30,7 @@ Command.parse = function(gameId, command, callback) {
     } else if (action == "merge") {
         Command.merge(gameId, tokens[1], tokens[2], callback);
     } else if (action == "end") {
-        Command.end(gameId, callback);
+        Command.endTurn(gameId, callback);
     } else {
         callback("unknown command!");
     }
@@ -99,5 +99,11 @@ Command.move = function (gameId, label, direction, callback) {
             }
         });
     }
-}
+};
+
+Command.endTurn = function (gameId, callback) {
+    Meteor.call("warriorEndTurn", gameId, function () {
+        callback();
+    });
+};
 

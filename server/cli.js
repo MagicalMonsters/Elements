@@ -42,19 +42,17 @@ Meteor.methods({
         });
     },
 
-    'warriorEnd': function (gameId, userId) {
-        var warriors = Warrior.fetchWarriors(gameId, userId);
+    'warriorEndTurn': function (gameId) {
+        var warriors = Warrior.fetchWarriors(gameId, Meteor.userId());
 
         // TODO: should get rid of this
         var game = Games.findOne({_id:gameId});
         for (var i = 0; i < warriors.length; i++) {
             warriors[i].backpack[game.board[warriors[i].position] - 1] += 1;
-            warriors[i].turnsToReincarnation = Math.max(warriors[i].turnsToReincarnation - 1, 0);
             warriors[i].moves = 0;
-            warriors[i].canSplit = false;
         }
 
-        Games.update({_id: gameId, "players.userId": userId}, {
+        Games.update({_id: gameId, "players.userId": Meteor.userId()}, {
             $set: {"players.$.warriors": warriors}
         });
 

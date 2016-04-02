@@ -30,7 +30,6 @@ function submit(gameId, command, e) {
     if (inProgress != 0) {
         return;
     }
-
     Session.set("log", "");
     Session.set("inProgress", Session.get("inProgress") + 1);
     Command.parse(gameId, command, function (error) {
@@ -100,71 +99,6 @@ function move(gameId, label, direction) {
     }
 }
 
-function attack(gameId, warrior1, warrior2) {
-
-    var result = Logic.calculateAttack(warrior1.composition, warrior2.composition);
-
-    var otherId = Board.findIdOfOwnerOfWarrior(gameId, warrior2.position);
-
-    if (_.reduce(result.composition2, function (memo, num) {
-            return memo + num;
-        }, 0) == 0) { // Defender died
-
-        var newPos = warrior2.position;
-        var newbackpack = warrior2.backpack;
-        newbackpack = _.map(newbackpack, function (num, index) {
-            return num + warrior1.backpack[index];
-        });
-        Session.set("inProgress", Session.get("inProgress") + 1);
-        Meteor.call("deleteWarrior", gameId, otherId, warrior2.label, function (error, result) {
-            Session.set("inProgress", Session.get("inProgress") - 1);
-        });
-        Session.set("inProgress", Session.get("inProgress") + 1);
-        Meteor.call("warriorSetPosition", gameId, warrior1.label, newPos, function (error, result) {
-            Session.set("inProgress", Session.get("inProgress") - 1);
-        });
-        Session.set("inProgress", Session.get("inProgress") + 1);
-        Meteor.call("warriorSetComposition", gameId, Meteor.userId(), warrior1.label, result.composition1,
-            false, newbackpack, function (error, result) {
-                Session.set("inProgress", Session.get("inProgress") - 1);
-            });
-    }
-    else if (_.reduce(result.composition1, function (memo, num) {
-            return memo + num;
-        }, 0) == 0) { //Attacker died
-        Session.set("inProgress", Session.get("inProgress") + 1);
-        Meteor.call("deleteWarrior", gameId, Meteor.userId(), warrior1.label, function (error, result) {
-            Session.set("inProgress", Session.get("inProgress") - 1);
-        });
-        Session.set("inProgress", Session.get("inProgress") + 1);
-        Meteor.call("warriorSetComposition", gameId, otherId,
-            warrior2.label, result.composition2, function (error, result) {
-                Session.set("inProgress", Session.get("inProgress") - 1);
-            });
-    }
-    else {
-        Session.set("inProgress", Session.get("inProgress") + 1);
-        Meteor.call("warriorSetComposition", gameId, Meteor.userId(), warrior1.label,
-            result.composition1, function (error, result) {
-                Session.set("inProgress", Session.get("inProgress") - 1);
-            });
-        Session.set("inProgress", Session.get("inProgress") + 1);
-        Meteor.call("warriorSetComposition", gameId, otherId, warrior2.label,
-            result.composition2, function (error, result) {
-                Session.set("inProgress", Session.get("inProgress") - 1);
-            });
-    }
-
-    return result.message;
-}
-
-function canMove(warrior) {
-
-    if (warrior.moves < 1) {
-        return true;
-    }
-    return false;
-}
 
 function add(gameId, label, elements) {
     var game = Games.findOne({_id: gameId});

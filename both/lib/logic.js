@@ -30,12 +30,12 @@ Logic.calculateAndApplyAttack = function (gameId, warrior, cellToMove) {
 
     // inform the loser
     Log.user(gameId, loserId, "You lost to warrior " + winnerWarrior.label + " of " + winnerName +
-        "\n. Her total was " + Element.sumOfElements(winnerWarrior.composition) +
+        ".\n Her total was " + Element.sumOfElements(winnerWarrior.composition) +
         " and yours was " + Element.sumOfElements(loserWarrior.composition) + ".");
 
     // inform the winner
     Log.user(gameId, winnerId, "You won the attack to warrior " + loserWarrior.label + " of " + loserName +
-        "\n. Your total was " + Element.sumOfElements(loserWarrior.composition) + ".");
+        ".\n Your total was " + Element.sumOfElements(loserWarrior.composition) + ".");
 
     // all the calculation is based on winner and loser
     loserWarrior.composition = Logic.reduceComposition(loserWarrior.composition, delta);

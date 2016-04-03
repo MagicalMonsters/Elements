@@ -57,8 +57,8 @@ Command.create = function (gameId, elements, coordinationString, callback) {
         return;
     }
 
+    Log.current(gameId, "You created a warrior with elements:[" + elems.toString() + "].");
     Meteor.call("warriorCreate", gameId, boardCellIndex, elems, function (error, result) {
-        Log.current(gameId, "Created a warrior with elements:[" + elems.toString() + "]");
         callback();
     });
 };

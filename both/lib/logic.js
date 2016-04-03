@@ -9,13 +9,13 @@ Logic.calculateAndApplyAttack = function (gameId, warrior, cellToMove) {
     var delta = Math.abs(playerTotal - opponentTotal);
 
     Log.current(gameId, "In attack, playerTotal is: " + playerTotal);
-    Log.current(gameId, "In attack, opponentTotal is: " + opponentTotal);
 
     // assume that warrior is winner
     var winnerWarrior = warrior;
     var loserWarrior = opponentWarrior;
 
     if (playerTotal < opponentTotal) {
+        Log.current(gameId, "In attack, opponentTotal is: " + opponentTotal);
         var temp = winnerWarrior;
         winnerWarrior = loserWarrior;
         loserWarrior = temp;

@@ -82,6 +82,7 @@ Command.move = function (gameId, label, direction, callback) {
     }
 
     var opponentWarrior = null;
+    var ownerId = Board.findIdOfOwnerOfWarrior(gameId, cellToMove);
     if (Logic.isMoveAttack(gameId, warrior, cellToMove)) {
         // fire cost
         warrior.composition[2]--;
@@ -95,7 +96,6 @@ Command.move = function (gameId, label, direction, callback) {
 
     Meteor.call("warriorUpdate", gameId, Meteor.userId(), warrior, function (error, result) {
         if (opponentWarrior) {
-            var ownerId = Board.findIdOfOwnerOfWarrior(gameId, cellToMove);
             Meteor.call("warriorUpdate", gameId, ownerId, opponentWarrior, function (error, result) {
                     callback();
             });

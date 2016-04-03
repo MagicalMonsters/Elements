@@ -8,6 +8,9 @@ Logic.calculateAndApplyAttack = function (gameId, warrior, cellToMove) {
 
     var delta = Math.abs(playerTotal - opponentTotal);
 
+    Log.current(gameId, "In attack, playerTotal is: " + playerTotal);
+    Log.current(gameId, "In attack, opponentTotal is: " + opponentTotal);
+
     // assume that warrior is winner
     var winnerWarrior = warrior;
     var loserWarrior = opponentWarrior;
@@ -17,6 +20,7 @@ Logic.calculateAndApplyAttack = function (gameId, warrior, cellToMove) {
         winnerWarrior = loserWarrior;
         loserWarrior = temp;
     }
+    
 
     // all the calculation is based on winner and loser
     loserWarrior.composition = Logic.reduceComposition(loserWarrior.composition, delta);

@@ -56,6 +56,7 @@ Template.games.events({
                 warriors: []
             }],
         });
+        
         Session.set('isCreatingGame', false);
     }
 });

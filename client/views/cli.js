@@ -2,11 +2,15 @@ Template.cli.helpers({
     isMyTurn: function () {
         return (Logic.isMyTurn(this.gameId, Meteor.userId())) ? "enabled" : "disabled";
     },
-    log: function () {
+    message: function () {
         return Session.get("log");
     },
     color: function () {
         return Session.get("log") == "success" ? "green" : "red";
+    },
+
+    log: function () {
+        return Logs.findOne({gameId: this.gameId, userId: Meteor.userId()}).text;
     }
 });
 
@@ -32,6 +36,8 @@ function submit(gameId, command, e) {
     Command.parse(gameId, command, function (error) {
         if (!error) {
             error = "success";
+        } else {
+            Log.current(gameId, error);
         }
         Session.set("log", error);
         inProgress = false;

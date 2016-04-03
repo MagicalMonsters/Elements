@@ -1,14 +1,30 @@
 Element = {};
 
 Element.elementsFromString = function (elemsString) {
+    if (!elemsString || _.isEmpty(elemsString)) {
+        return undefined;
+    }
     var elems = elemsString.split(",");
-    return _(elems).map(function (elem) {
-        return parseInt(elem);
+    if (elems.length != 4) {
+        return undefined;
+    }
+    var isCorrect = true;
+    var ints = _(elems).map(function (elem) {
+        var item = parseInt(elem);
+        if (!_.isFinite(item) || item < 0) {
+            isCorrect = false;
+        }
+        return item;
     });
+
+    if (!isCorrect) {
+        return undefined;
+    }
+    return ints;
 };
 
 Element.sumOfElements = function (elems) {
-    return sum = _(elems).reduce(function (memo, num) {
+    return _.reduce(elems, function (memo, num) {
         return memo + num;
     }, 0);
 };

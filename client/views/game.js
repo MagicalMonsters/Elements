@@ -72,5 +72,15 @@ Template.game.events({
                 board: createBoard(8)
             }
         });
+
+        var game = Games.findOne({_id: this.gameId});
+        for (var i = 0; i < game.players.length; i++) {
+            Logs.insert({
+                gameId: this.gameId,
+                userId: game.players[i].userId,
+                text: "",
+            });
+        }
+        Log.game(this.gameId, "Game started.");
     }
 })

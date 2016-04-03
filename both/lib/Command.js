@@ -3,17 +3,18 @@ Command = {};
 Command.parse = function(gameId, command, callback) {
     if (!callback) {
         callback = function (error){};
+        Log.current(gameId, "callback function is not set!");
     }
     if (!Logic.isMyTurn(gameId, Meteor.userId())) {
         callback("This is not your turn!");
         return;
     }
-    if (_.isEmpty(command)) {
-        callback("Empty command!");
+    if (!command || _.isEmpty(command)) {
+        callback("Invalid command!");
         return;
     }
     var tokens = command.split(" ");
-    if (_.isEmpty(tokens)) {
+    if (!tokens || _.isEmpty(tokens) || tokens.length < 1) {
         callback("Malformed command!");
         return;
     }
@@ -32,14 +33,24 @@ Command.parse = function(gameId, command, callback) {
     } else if (action == "end") {
         Command.endTurn(gameId, callback);
     } else {
-        callback("unknown command!");
+        callback("Unknown command!");
     }
 };
 
 Command.create = function (gameId, elements, coordinationString, callback) {
+    if (!elements || _.isEmpty(elements) ||
+        !coordinationString || _.isEmpty(coordinationString)) {
+        callback("Not enough arguments!");
+        return;
+    }
     var elems = Element.elementsFromString(elements);
+    if (!elems) {
+        callback("Invalid composition!");
+        return;
+    }
     var boardCellIndex = Board.coordinationStringToPosition(gameId, coordinationString);
-    
+    // TODO: add more guards for coordinationStringToPosition
+
     var error = Logic.isValidCreate(gameId, elems, boardCellIndex);
     if (error) {
         callback(error);
@@ -47,6 +58,7 @@ Command.create = function (gameId, elements, coordinationString, callback) {
     }
 
     Meteor.call("warriorCreate", gameId, boardCellIndex, elems, function (error, result) {
+        Log.current(gameId, "Created a warrior with elements:[" + elems.toString() + "]");
         callback();
     });
 };

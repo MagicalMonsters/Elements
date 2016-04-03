@@ -3,10 +3,12 @@
         <input name="command" type="text">
         <button type="submit" {{isMyTurn}}>GO</button>
     </form>
+    <span id="cli_log" style="color:{{color}};">
+        {{message}}
+    </span>
     <form id="end_turn">
         <button type="submit" {{isMyTurn}}>end</button>
     </form>
-    <span id="cli_log" style="color:{{color}};">
-        {{log}}
-    </span>
+
+    <textarea readonly style="width:200px; height: 170px; resize:both; float:left;">{{log}}</textarea>
 </template>

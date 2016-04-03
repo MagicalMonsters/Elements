@@ -204,6 +204,7 @@ Command.merge = function (gameId, label, elements, direction, callback) {
 Command.endTurn = function (gameId, callback) {
     Log.current(gameId, "You finished your turn.");
     Meteor.call("warriorEndTurn", gameId, function () {
+        Log.game(gameId, "Now it is " + Logic.currentTurnPlayerName(gameId) + "'s turn.");
         callback();
     });
 };

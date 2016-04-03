@@ -2,6 +2,13 @@ Template.game.helpers({
     name: function () {
         return Games.findOne({_id: this.gameId}).name;
     },
+
+    players: function () {
+        return _.reduce(Games.findOne({_id: this.gameId}).players, function (init, player) {
+            return init + " " + player.userName;
+        }, "");
+    },
+
     canJoin: function () {
         var game = Games.findOne({_id: this.gameId});
         return (Meteor.userId() != game.owner.userId) && (game.turn == -1) && _.find(game.players, function (player) {
@@ -82,5 +89,6 @@ Template.game.events({
             });
         }
         Log.game(this.gameId, "Game started.");
+        Log.game(this.gameId, "Now it is " + Logic.currentTurnPlayerName(this.gameId) + "'s turn.");
     }
 })

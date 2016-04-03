@@ -85,6 +85,12 @@ Logic.isMyTurn = function (gameId, userId) {
     return true;
 };
 
+Logic.currentTurnPlayerName = function (gameId) {
+    var game = Games.findOne({_id: gameId});
+    var index = game.turn % game.players.length;
+    return game.players[index].userName;
+}
+
 Logic.isFirstRound = function (gameId) {
     var game = Games.findOne({_id: gameId});
     return game.turn < game.players.length;

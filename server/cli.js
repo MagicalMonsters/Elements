@@ -61,3 +61,25 @@ Meteor.methods({
         });
     },
 });
+
+
+// Meteor.startup(function () {
+//     var games = Games.find();
+//     var gameIds = [];
+//     games.forEach(function (game) {
+//         if (!_.find(game.players, function (player) {return player.userId == game.owner.userId})) {
+//             gameIds.push(game._id);
+//         }
+//     })
+//
+//     if (gameIds.length == 0) {
+//         return;
+//     }
+//
+//     Games.update({}, {
+//         $pull: {
+//             _id: {$in: gameIds}
+//         }
+//     });
+//
+// });

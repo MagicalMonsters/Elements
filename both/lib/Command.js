@@ -72,11 +72,14 @@ Command.move = function (gameId, label, direction, callback) {
         callback(error);
         return;
     }
-    
+
+    var airSpent = 0;
     // update the composition based on move
     if (warrior.moves != 0) {
         // air cost
         warrior.composition[0]--;
+        airSpent += 1;
+
     } else {
         warrior.moves++;
     }
@@ -86,12 +89,16 @@ Command.move = function (gameId, label, direction, callback) {
     if (Logic.isMoveAttack(gameId, warrior, cellToMove)) {
         // fire cost
         warrior.composition[2]--;
+        Log.current(gameId, "You spent 1 fire and " + airSpent + " air for the attack.");
         opponentWarrior = Logic.calculateAndApplyAttack(gameId, warrior, cellToMove);
+    } else {
+        Log.current(gameId, "You spent " + airSpent + " air for the move.");
     }
 
     if (!opponentWarrior || Element.sumOfElements(opponentWarrior.composition) == 0) {
         // we can move the warrior
         warrior.position = cellToMove;
+        Log.current(gameId, "Congrats! You kill the warrior and replaced it.");
     }
 
     Meteor.call("warriorUpdate", gameId, Meteor.userId(), warrior, function (error, result) {
@@ -123,6 +130,8 @@ Command.add = function (gameId, label, elements, callback) {
         warrior.backpack[i] -= elems[i];
     }
 
+    Log.current(gameId, "You spent 1 earth and added from your backpack to your composition.");
+
     Meteor.call("warriorUpdate", gameId, Meteor.userId(), warrior, function () {
         callback();
     });
@@ -145,6 +154,8 @@ Command.split = function (gameId, label, elements, direction, callback) {
     for (var i = 0; i < warrior.composition.length; i++) {
         warrior.composition[i] -= elems[i];
     }
+
+    Log.current(gameId, "You spent 1 water and split your warrior.");
 
     Meteor.call("warriorCreate", gameId, cellToMove, elems, function (error, result) {
         Meteor.call("warriorUpdate", gameId, Meteor.userId(), warrior, function () {
@@ -177,6 +188,12 @@ Command.merge = function (gameId, label, elements, direction, callback) {
         warrior.composition[i] = 0;
     }
 
+    if (shouldAddBackback) {
+        Log.current(gameId, "You spent 1 water and merged two warriors completely with their backpacks.");
+    } else {
+        Log.current(gameId, "You spent 1 water and merged some composition of two warriors.");
+    }
+
     Meteor.call("warriorUpdate", gameId, Meteor.userId(), warrior, function () {
         Meteor.call("warriorUpdate", gameId, Meteor.userId(), destWarrior, function () {
             callback();
@@ -185,6 +202,7 @@ Command.merge = function (gameId, label, elements, direction, callback) {
 };
 
 Command.endTurn = function (gameId, callback) {
+    Log.current(gameId, "You finished your turn.");
     Meteor.call("warriorEndTurn", gameId, function () {
         callback();
     });

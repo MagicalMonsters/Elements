@@ -58,6 +58,18 @@ Board.findIdOfOwnerOfWarrior = function (gameId, position) {
     }
 };
 
+Board.findNameOfOwnerOfWarrior = function (gameId, position) {
+    var game = Games.findOne({_id: gameId});
+    for (var i = 0; i < game.players.length; i++) {
+        var Id = game.players[i].userId;
+        if (!(_.isUndefined(_.find(game.players[i].warriors, function (warrior) {
+                return warrior.position == position;
+            })))) {
+            return game.players[i].userName;
+        }
+    }
+};
+
 Board.playerColor = function (index) {
     if (index == undefined || index < 0 || index > 4) {
         return undefined;

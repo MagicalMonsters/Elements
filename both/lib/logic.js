@@ -8,19 +8,34 @@ Logic.calculateAndApplyAttack = function (gameId, warrior, cellToMove) {
 
     var delta = Math.abs(playerTotal - opponentTotal);
 
-    Log.current(gameId, "In attack, playerTotal is: " + playerTotal);
+    var opponentName = Board.findNameOfOwnerOfWarrior(gameId, cellToMove);
+    // Log.current(gameId, "You attacked warrior " + opponentWarrior.label +
+    //     " of " + opponentName +  " , playerTotal is: " + playerTotal);
 
     // assume that warrior is winner
     var winnerWarrior = warrior;
     var loserWarrior = opponentWarrior;
 
     if (playerTotal < opponentTotal) {
-        Log.current(gameId, "In attack, opponentTotal is: " + opponentTotal);
         var temp = winnerWarrior;
         winnerWarrior = loserWarrior;
         loserWarrior = temp;
     }
-    
+
+
+    var winnerName = Board.findNameOfOwnerOfWarrior(gameId, winnerWarrior.position);
+    var winnerId = Board.findIdOfOwnerOfWarrior(gameId, winnerWarrior.position);
+    var loserName = Board.findNameOfOwnerOfWarrior(gameId, loserWarrior.position);
+    var loserId = Board.findIdOfOwnerOfWarrior(gameId, loserWarrior.position);
+
+    // inform the loser
+    Log.user(gameId, loserId, "You lost to warrior " + winnerWarrior.label + " of " + winnerName +
+        "\n. Her total was " + Element.sumOfElements(winnerWarrior.composition) +
+        " and yours was " + Element.sumOfElements(loserWarrior.composition) + ".");
+
+    // inform the winner
+    Log.user(gameId, winnerId, "You won the attack to warrior " + loserWarrior.label + " of " + loserName +
+        "\n. Your total was " + Element.sumOfElements(loserWarrior.composition) + ".");
 
     // all the calculation is based on winner and loser
     loserWarrior.composition = Logic.reduceComposition(loserWarrior.composition, delta);
